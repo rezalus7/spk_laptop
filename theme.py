@@ -37,6 +37,17 @@ def inject():
     /* ── Hide Streamlit chrome yang tidak perlu ── */
     #MainMenu, footer { visibility: hidden !important; }
     [data-testid="stDecoration"] { display: none !important; }
+
+    /* ── Sembunyikan toolbar Streamlit Cloud (Share, Star, Edit, GitHub) ── */
+    [data-testid="stToolbar"],
+    [data-testid="stToolbarActions"],
+    .stToolbar,
+    header [data-testid="stToolbar"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
     
     /* Padding atas container konten utama agar pas saat sidebar dicollapse */
     .block-container { padding-top: 2rem !important; }
