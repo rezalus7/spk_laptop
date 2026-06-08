@@ -13,6 +13,7 @@ enableXsrfProtection = true
 
 [client]
 showSidebarNavigation = false
+toolbarMode = "viewer"  # ── TAMBAHKAN BARIS INI UNTUK SEMBUNYIIN TOOLBAR ──
 
 [browser]
 gatherUsageStats = false
