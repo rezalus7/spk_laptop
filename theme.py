@@ -34,35 +34,75 @@ def inject():
         color: var(--text);
     }
 
-    /* ── Sembunyikan Navigasi & Header Bawaan Total ── */
-    #MainMenu, footer, header, [data-testid="stHeader"] { 
-        display: none !important;
-        visibility: hidden !important; 
-    }
+    /* ── Hide Streamlit chrome ── */
+    #MainMenu, footer { visibility: hidden !important; }
     [data-testid="stDecoration"] { display: none !important; }
-    .block-container { padding-top: 1.5rem !important; }
+    
+    /* Berikan padding atas yang aman agar tidak menabrak header */
+    .block-container { padding-top: 3.5rem !important; }
 
-    /* Hapus total tombol collapse bawaan asli (<<) agar tidak mengganggu ketukan jari di HP */
-    [data-testid="stSidebarCollapsedControl"], 
-    button[aria-label="Collapse sidebar"],
-    [data-testid="collapsedControl"],
-    section[data-testid="stSidebar"] button {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
+    /* ── KUSTOMISASI HEADER & TOMBOL SIDEBAR BAWAAN (FIX HP) ── */
+    /* Pastikan bar header atas tetap muncul secara transparan */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        visibility: visible !important;
+        display: flex !important;
+        height: 50px !important;
     }
 
-    /* ── Style Menu Sidebar Kustom Gelap ── */
+    /* Sembunyikan elemen dekoratif bawaan lain di header jika ada */
+    header[data-testid="stHeader"] button:not([data-testid="stSidebarCollapsedControl"]) {
+        display: none !important;
+    }
+
+    /* KUSTOMISASI TOMBOL PEMBUKA SIDEBAR (>) AGAR BESAR DAN RESPONSIF DI HP */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: block !important;
+        visibility: visible !important;
+        position: fixed !important;
+        top: 12px !important;
+        left: 12px !important;
+        z-index: 999999 !important;
+    }
+    
+    [data-testid="stSidebarCollapsedControl"] button {
+        background-color: var(--card) !important;
+        color: var(--accent) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        width: 44px !important;
+        height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        cursor: pointer !important;
+    }
+    
+    [data-testid="stSidebarCollapsedControl"] button svg {
+        width: 24px !important;
+        height: 24px !important;
+        fill: var(--accent) !important;
+    }
+
+    /* KUSTOMISASI TOMBOL PENUTUP SIDEBAR (<<) DI DALAM MENU */
+    section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"] {
+        background-color: rgba(255,255,255,0.05) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        width: 38px !important;
+        height: 38px !important;
+        margin-top: 4px !important;
+        cursor: pointer !important;
+    }
+
+    /* ── Style Menu Sidebar ── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
         border-right: 1px solid rgba(59,130,246,0.1) !important;
     }
     [data-testid="stSidebar"] * { color: var(--text) !important; }
-
-    /* Desain tombol menu buka/tutup kustom agar terlihat modern */
-    .menu-container {
-        margin-bottom: 20px;
-    }
 
     /* ── Native buttons ── */
     .stButton > button {
@@ -105,14 +145,6 @@ def inject():
         height: 44px !important;
         font-size: 14px !important;
     }
-    [data-testid="stTextInput"] input:focus,
-    [data-testid="stNumberInput"] input:focus {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.15) !important;
-    }
-    [data-testid="stTextInput"] label,
-    [data-testid="stNumberInput"] label,
-    [data-testid="stSelectbox"] label { color: var(--soft) !important; font-size: 13px !important; }
 
     /* ── Selectbox ── */
     [data-testid="stSelectbox"] > div > div {
@@ -141,10 +173,6 @@ def inject():
         font-weight: 500 !important;
         font-size: 13px !important;
     }
-    [data-testid="stTabs"] [aria-selected="true"] {
-        background: var(--accent) !important;
-        color: #fff !important;
-    }
 
     /* ── Forms ── */
     [data-testid="stForm"] {
@@ -165,10 +193,6 @@ def inject():
         white-space: nowrap; text-align: left;
     }
     .spk-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
-    .spk-table tr.r-even td { background: var(--bg); }
-    .spk-table tr.r-odd  td { background: var(--card); }
-    .spk-table tr.r-best td { background: #0a2218; color: var(--green); font-weight: 700; }
-    .spk-table tr:hover td { filter: brightness(1.15); }
     .tc { text-align: center !important; }
 
     /* ── Best result card ── */
@@ -177,13 +201,6 @@ def inject():
         border: 1px solid var(--green);
         border-radius: 12px; padding: 18px 22px; margin: 16px 0;
     }
-    .best-result .title { color: var(--green); font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-    .best-result .badge {
-        display: inline-block; background: rgba(34,197,94,.15);
-        color: var(--green); font-size: 11px; font-weight: 700;
-        padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; letter-spacing: .5px;
-    }
-    .best-result .desc { color: #86efac; font-size: 13px; line-height: 1.6; }
 
     /* ── Section header ── */
     .section-title {
@@ -191,12 +208,6 @@ def inject():
         letter-spacing: -.3px; margin: 0 0 4px 0;
     }
     .section-sub { color: var(--muted); font-size: 13px; margin: 0 0 20px 0; }
-
-    /* ── Info banner ── */
-    .info-banner {
-        background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.25);
-        color: #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 13px;
-    }
 
     /* Sidebar page_link styling */
     [data-testid="stSidebar"] [data-testid="stPageLink"] a {
@@ -210,12 +221,10 @@ def inject():
         text-decoration: none !important;
         margin-bottom: 4px !important;
         transition: all .15s ease !important;
-        border: 1px solid transparent !important;
     }
     [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {
         background: rgba(59,130,246,.1) !important;
         color: #60a5fa !important;
-        border-color: rgba(59,130,246,.2) !important;
     }
 
     /* ── Stat mini cards grid ── */
@@ -225,8 +234,5 @@ def inject():
         background: var(--card); border: 1px solid var(--border);
         border-radius: 10px; padding: 12px 16px;
     }
-    .mini-card .lbl { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
-    .mini-card .val { color: var(--text); font-size: 17px; font-weight: 700; margin-top: 3px; }
-    .mini-card .val.accent { color: var(--accent); }
     </style>
     """, unsafe_allow_html=True)
