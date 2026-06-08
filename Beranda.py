@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="SPK Laptop — SMART",
     page_icon="💻",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed", # Mengubah default menjadi tertutup jika ter-render
 )
 
 theme.inject()
@@ -20,29 +20,23 @@ if "auth_mode" not in st.session_state:
 
 mode = st.session_state.auth_mode
 
-# ─── Sidebar branding ────────────────────────────────────
-with st.sidebar:
-    st.markdown("""
-    <div style="padding: 40px 20px 32px 20px; text-align: center;">
-        <div style="
-            width: 72px; height: 72px; margin: 0 auto 20px auto;
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f2040 100%);
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            font-size: 36px; border: 1px solid rgba(59,130,246,0.3);
-            box-shadow: 0 8px 32px rgba(59,130,246,0.15);
-        ">🖥️</div>
-        <div style="color:#f1f5f9; font-weight:800; font-size:20px; letter-spacing:3px; font-family:'DM Sans',sans-serif;">SPK LAPTOP</div>
-        <div style="color:#3b82f6; font-size:11px; margin-top:6px; font-family:'Space Mono',monospace; letter-spacing:3px;">METODE SMART</div>
-        <div style="width:40px; height:2px; background:linear-gradient(90deg,#3b82f6,#06b6d4); margin:20px auto;border-radius:2px;"></div>
-        <div style="color:#475569; font-size:12px; line-height:1.8; font-family:'DM Sans',sans-serif;">
-            <br><br>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ─── Extra CSS for modern login ──────────────────────────
+# ─── Extra CSS untuk Menghilangkan Sidebar Total ─────────
 st.markdown("""
 <style>
+/* Sembunyikan sidebar bawaan Streamlit secara absolut */
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0px !important;
+}
+
+/* Maksimalkan lebar konten utama agar form benar-benar di tengah */
+[data-testid="stMainBlockContainer"] {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
 @keyframes fadeUp {
     from { opacity:0; transform:translateY(24px); }
     to   { opacity:1; transform:translateY(0); }
@@ -76,7 +70,7 @@ st.markdown("""
     content: ''; flex: 1;
     height: 1px; background: #1e2d45;
 }
-/* Override form background for login page only */
+/* Override form background */
 .login-page [data-testid="stForm"] {
     background: rgba(15,21,34,0.7) !important;
     border: 1px solid rgba(59,130,246,0.15) !important;
@@ -138,13 +132,14 @@ st.markdown("""
 # ─── Layout ──────────────────────────────────────────────
 st.markdown('<div class="login-page">', unsafe_allow_html=True)
 
-_, center, _ = st.columns([1, 1.2, 1])
+# Kolom tengah dilebarkan sedikit agar proporsional tanpa sidebar
+_, center, _ = st.columns([1, 1.4, 1])
 
 with center:
     st.markdown("<div style='height:80px'></div>", unsafe_allow_html=True)
     st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
 
-    # Big title above card
+    # Big title di atas card login
     page_label = "LOGIN" if mode == "login" else "DAFTAR AKUN"
     st.markdown(f"""
     <h1 style="
@@ -214,12 +209,6 @@ with center:
         if st.button("← Kembali ke Login", use_container_width=True, key="go_login", type="secondary"):
             st.session_state.auth_mode = "login"
             st.rerun()
-
-    st.markdown("""
-    <p style="text-align:center; color:#1e293b; font-size:12px; margin-top:28px; font-family:'Space Mono',monospace;">
-        demo &nbsp;·&nbsp; <span style='color:#334155'> / </span> &nbsp;|&nbsp; <span style='color:#334155'>/ </span>
-    </p>
-    """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
