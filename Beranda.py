@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="SPK Laptop — SMART",
     page_icon="💻",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed", # Sembunyikan sidebar bawaan sejak awal
 )
 
 theme.inject()
@@ -20,64 +20,24 @@ if "auth_mode" not in st.session_state:
 
 mode = st.session_state.auth_mode
 
-# ─── Sidebar branding ────────────────────────────────────
-with st.sidebar:
-    st.markdown("""
-    <div style="padding: 40px 20px 32px 20px; text-align: center;">
-        <div style="
-            width: 72px; height: 72px; margin: 0 auto 20px auto;
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f2040 100%);
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            font-size: 36px; border: 1px solid rgba(59,130,246,0.3);
-            box-shadow: 0 8px 32px rgba(59,130,246,0.15);
-        ">🖥️</div>
-        <div style="color:#f1f5f9; font-weight:800; font-size:20px; letter-spacing:3px; font-family:'DM Sans',sans-serif;">SPK LAPTOP</div>
-        <div style="color:#3b82f6; font-size:11px; margin-top:6px; font-family:'Space Mono',monospace; letter-spacing:3px;">METODE SMART</div>
-        <div style="width:40px; height:2px; background:linear-gradient(90deg,#3b82f6,#06b6d4); margin:20px auto;border-radius:2px;"></div>
-        <div style="color:#475569; font-size:12px; line-height:1.8; font-family:'DM Sans',sans-serif;">
-            <br><br>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ─── Responsive CSS (Fix Tampilan HP vs PC) ──────────────
+# ─── Extra CSS untuk UI Modern Tanpa Sidebar ──────────────
 st.markdown("""
 <style>
-/* ── KONDISI DEFAULT UNTUK PC ── */
-/* Sembunyikan tombol panah collapse (<<) di sidebar */
-[data-testid="stSidebarCollapsedControl"], 
-button[data-testid="baseButton-header"],
-[data-testid="collapsedControl"] {
+/* Sembunyikan total sidebar bawaan Streamlit di PC dan HP */
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"], 
+button[data-testid="baseButton-header"], [data-testid="collapsedControl"] {
     display: none !important;
     visibility: hidden !important;
-}
-/* Kunci tombol collapse internal */
-section[data-testid="stSidebar"] button {
-    display: none !important;
+    width: 0px !important;
 }
 
-/* ── KONDISI KHUSUS UNTUK HP / MOBILE LAYAR KECIL (Maksimal Lebar 768px) ── */
-@media (max-width: 768px) {
-    /* Sembunyikan total sidebar di halaman login khusus saat dibuka di HP */
-    [data-testid="stSidebar"] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0px !important;
-    }
-    /* Lebarkan container utama agar form login pas di layar HP */
-    [data-testid="stMainBlockContainer"] {
-        max-width: 100% !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-    /* Sesuaikan ukuran judul di HP agar tidak kebesaran */
-    .login-page h1 {
-        font-size: 28px !important;
-        letter-spacing: 6px !important;
-    }
+/* Optimasi lebar kontainer utama agar simetris di tengah */
+[data-testid="stMainBlockContainer"] {
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
 }
 
-/* ── ANIMASI & STYLE LAINNYA ── */
 @keyframes fadeUp {
     from { opacity:0; transform:translateY(24px); }
     to   { opacity:1; transform:translateY(0); }
@@ -95,7 +55,7 @@ section[data-testid="stSidebar"] button {
     letter-spacing: 5px;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     background: linear-gradient(90deg, #60a5fa, #06b6d4, #60a5fa);
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -103,7 +63,8 @@ section[data-testid="stSidebar"] button {
     background-clip: text;
     animation: shimmer 3s linear infinite;
 }
-/* Override form background */
+
+/* Style form login modern */
 .login-page [data-testid="stForm"] {
     background: rgba(15,21,34,0.7) !important;
     border: 1px solid rgba(59,130,246,0.15) !important;
@@ -116,12 +77,14 @@ section[data-testid="stSidebar"] button {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2), 0 0 20px rgba(59,130,246,0.1) !important;
 }
+
+/* Tombol Register */
 .register-btn .stButton > button {
     background: linear-gradient(135deg, #16a34a, #15803d) !important;
     color: #fff !important;
     border-radius: 12px !important;
-    height: 48px !important;
-    font-size: 15px !important;
+    height: 46px !important;
+    font-size: 14px !important;
     letter-spacing: 1px !important;
     box-shadow: 0 4px 20px rgba(22,163,74,0.3) !important;
     transition: all 0.2s ease !important;
@@ -130,11 +93,13 @@ section[data-testid="stSidebar"] button {
     box-shadow: 0 8px 32px rgba(22,163,74,0.45) !important;
     transform: translateY(-1px) !important;
 }
+
+/* Tombol Login Submit */
 .login-page [data-testid="stForm"] .stFormSubmitButton > button {
     background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
     border-radius: 12px !important;
-    height: 48px !important;
-    font-size: 15px !important;
+    height: 46px !important;
+    font-size: 14px !important;
     letter-spacing: 1px !important;
     box-shadow: 0 4px 20px rgba(59,130,246,0.35) !important;
     transition: all 0.2s ease !important;
@@ -144,6 +109,8 @@ section[data-testid="stSidebar"] button {
     box-shadow: 0 8px 32px rgba(59,130,246,0.5) !important;
     transform: translateY(-1px) !important;
 }
+
+/* Latar belakang dekoratif */
 .dot-bg {
     position: fixed; inset: 0; pointer-events: none; z-index: -1;
     background-image: radial-gradient(circle, rgba(59,130,246,0.06) 1px, transparent 1px);
@@ -152,37 +119,49 @@ section[data-testid="stSidebar"] button {
 .glow-orb {
     position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; filter: blur(80px);
 }
+
+/* Responsivitas ukuran teks di HP */
+@media (max-width: 768px) {
+    .branding-title { font-size: 22px !important; letter-spacing: 2px !important; }
+    .branding-sub { font-size: 10px !important; }
+}
 </style>
 <div class="dot-bg"></div>
 <div class="glow-orb" style="width:400px;height:400px;top:-100px;right:10%;background:rgba(59,130,246,0.06);"></div>
 <div class="glow-orb" style="width:300px;height:300px;bottom:0;left:30%;background:rgba(6,182,212,0.05);"></div>
 """, unsafe_allow_html=True)
 
-# ─── Layout ──────────────────────────────────────────────
+# ─── Layout Konten Tengah ────────────────────────────────
 st.markdown('<div class="login-page">', unsafe_allow_html=True)
 
-# Kolom grid seimbang
-_, center, _ = st.columns([1, 1.2, 1])
+# Memakai kolom tengah yang pas (tidak terlalu lebar di PC, aman di HP)
+_, center, _ = st.columns([1.1, 1, 1.1])
 
 with center:
     st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
     st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
 
-    page_label = "LOGIN" if mode == "login" else "DAFTAR AKUN"
-    st.markdown(f"""
-    <h1 style="
-        color:#e2e8f0; font-size:38px; font-weight:800;
-        letter-spacing:10px; text-align:center;
-        margin-bottom:40px; font-family:'DM Sans',sans-serif;
-        text-shadow: 0 0 40px rgba(59,130,246,0.3);
-    ">{page_label}</h1>
+    # BRANDING LOGO & TULISAN DI ATAS FORM LOGIN
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 32px;">
+        <div style="
+            width: 64px; height: 64px; margin: 0 auto 16px auto;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2040 100%);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 32px; border: 1px solid rgba(59,130,246,0.25);
+            box-shadow: 0 8px 32px rgba(59,130,246,0.15);
+        ">🖥️</div>
+        <div class="branding-title" style="color:#f1f5f9; font-weight:800; font-size:26px; letter-spacing:4px; font-family:'DM Sans',sans-serif;">SPK LAPTOP</div>
+        <div class="branding-sub" style="color:#3b82f6; font-size:11px; margin-top:4px; font-family:'Space Mono',monospace; letter-spacing:3px;">METODE SMART</div>
+        <div style="width:32px; height:2px; background:linear-gradient(90deg,#3b82f6,#06b6d4); margin:16px auto 0 auto; border-radius:2px;"></div>
+    </div>
     """, unsafe_allow_html=True)
 
     state.show_flash()
 
     if mode == "login":
         with st.form("form_login", clear_on_submit=False):
-            st.markdown('<p class="login-card-title">Masuk ke akun Anda</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="login-card-title">Masuk ke akun</p>', unsafe_allow_html=True)
             username = st.text_input("", placeholder="✦  Username", label_visibility="collapsed")
             st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
             password = st.text_input("", type="password", placeholder="✦  Password", label_visibility="collapsed")
