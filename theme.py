@@ -34,21 +34,26 @@ def inject():
         color: var(--text);
     }
 
-    /* ── Hide Streamlit chrome yang tidak perlu ── */
-    #MainMenu, footer { visibility: hidden !important; }
-    [data-testid="stDecoration"] { display: none !important; }
-    
-    /* Padding atas container konten utama agar pas saat sidebar dicollapse */
-    .block-container { padding-top: 2rem !important; }
-
-    /* ── PERBAIKAN TOMBOL SIDEBAR (HP & LAPTOP) ── */
-    /* Pastikan header tombol pembuka ( > ) di pojok kiri atas terlihat jelas dan responsif */
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        visibility: visible !important;
+    /* ── PERBAIKAN UTAMA: HAPUS PAKSA TOOLBAR DEVELOPER (FORK & GITHUB) ── */
+    /* Menargetkan kontainer bar status atas bawaan Streamlit Cloud */
+    [data-testid="stStatusWidget"], 
+    .stAppToolbar, 
+    footer, 
+    header, 
+    [data-testid="stHeader"] { 
+        display: none !important;
+        visibility: hidden !important; 
+        opacity: 0 !important;
+        height: 0px !important;
     }
     
-    /* Beri warna terang pada tombol penutup (<<) dan pembuka (>) native Streamlit agar kelihatan jelas */
+    #MainMenu { visibility: hidden !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    
+    /* Atur jarak atas kontainer utama agar simetris */
+    .block-container { padding-top: 2rem !important; }
+
+    /* ── Perbaikan Tombol Navigasi Bawaan (<< dan >) ── */
     header[data-testid="stHeader"] button, 
     [data-testid="stSidebarCollapsedControl"] button,
     section[data-testid="stSidebar"] button {
@@ -157,16 +162,6 @@ def inject():
         box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
     }
 
-    /* ── Metric ── */
-    [data-testid="stMetric"] {
-        background: var(--card) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 10px !important;
-        padding: 16px !important;
-    }
-    [data-testid="stMetricLabel"] { color: var(--muted) !important; font-size: 12px !important; }
-    [data-testid="stMetricValue"] { color: var(--text) !important; font-size: 22px !important; font-weight: 700 !important; }
-
     /* ── Custom table ── */
     .spk-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-top: 14px; }
     .spk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -207,26 +202,6 @@ def inject():
     .info-banner {
         background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.25);
         color: #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 13px;
-    }
-
-    /* Sidebar page_link styling */
-    [data-testid="stSidebar"] [data-testid="stPageLink"] a {
-        display: flex !important;
-        align-items: center !important;
-        padding: 10px 14px !important;
-        border-radius: 8px !important;
-        color: #94a3b8 !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        text-decoration: none !important;
-        margin-bottom: 4px !important;
-        transition: all .15s ease !important;
-        border: 1px solid transparent !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {
-        background: rgba(59,130,246,.1) !important;
-        color: #60a5fa !important;
-        border-color: rgba(59,130,246,.2) !important;
     }
 
     /* ── Stat mini cards grid ── */
