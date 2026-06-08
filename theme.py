@@ -39,14 +39,19 @@ def inject():
     [data-testid="stDecoration"] { display: none !important; }
 
     /* ── Sembunyikan toolbar Streamlit Cloud (Share, Star, Edit, GitHub) ── */
-    [data-testid="stToolbar"],
-    [data-testid="stToolbarActions"],
-    .stToolbar,
-    header [data-testid="stToolbar"] {
+    /* Target hanya tombol Share/Star/Edit/GitHub, BUKAN tombol buka sidebar */
+    [data-testid="stToolbarActions"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         pointer-events: none !important;
+    }
+    /* Tombol pembuka sidebar (hamburger) tetap terlihat */
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     /* Padding atas container konten utama agar pas saat sidebar dicollapse */
