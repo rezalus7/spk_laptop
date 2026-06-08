@@ -34,56 +34,36 @@ def inject():
         color: var(--text);
     }
 
-    /* ── Hide Streamlit chrome (Kecuali tombol pembuka sidebar) ── */
-    #MainMenu, footer { visibility: hidden !important; }
-    [data-testid="stDecoration"] { display: none !important; }
-    .block-container { padding-top: 1.5rem !important; }
-
-    /* ── PERBAIKAN HEADER & TOMBOL PEMBUKA SIDEBAR (>) ── */
-    /* Pastikan header pembuka sidebar tetap terlihat dan transparan */
-    header[data-testid="stHeader"] {
-        visibility: visible !important;
-        background: transparent !important;
-    }
-    /* Sembunyikan tombol default lain di header jika ada, kecuali tombol pembuka sidebar */
-    header[data-testid="stHeader"] button:not([data-testid="stSidebarCollapsedControl"]) {
+    /* ── Sembunyikan Navigasi & Header Bawaan Total ── */
+    #MainMenu, footer, header, [data-testid="stHeader"] { 
         display: none !important;
+        visibility: hidden !important; 
+    }
+    [data-testid="stDecoration"] { display: none !important; }
+    .block-container { padding-top: 2rem !important; }
+
+    /* Sembunyikan paksa tombol bawaan collapse Streamlit (<<) agar tidak merusak layout */
+    [data-testid="stSidebarCollapsedControl"], 
+    button[aria-label="Collapse sidebar"],
+    [data-testid="collapsedControl"] {
+        display: none !important;
+        visibility: hidden !important;
     }
 
-    /* Tampilan tombol pembuka kembali (>) saat posisi tertutup */
-    [data-testid="stSidebarCollapsedControl"] {
-        display: block !important;
-        visibility: visible !important;
-        left: 10px !important;
-        top: 10px !important;
-    }
-    [data-testid="stSidebarCollapsedControl"] button {
-        background-color: var(--card) !important;
-        color: var(--text) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
-        padding: 4px !important;
-        cursor: pointer !important;
-    }
-
-    /* ── Tampilan tombol penutup (<<) di dalam sidebar ── */
-    section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"],
-    section[data-testid="stSidebar"] button {
-        background-color: rgba(255,255,255,0.05) !important;
-        color: var(--text) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
-        cursor: pointer !important;
-        display: flex !important;
-        visibility: visible !important;
-    }
-
-    /* ── Sidebar Background ── */
+    /* ── Kustomisasi Sidebar Gelap ── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
         border-right: 1px solid rgba(59,130,246,0.1) !important;
     }
     [data-testid="stSidebar"] * { color: var(--text) !important; }
+
+    /* ── Kustomisasi Style untuk Tombol Menu Toggle ── */
+    div.element-container:has(button[key="menu_toggle_btn"]) {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 999999;
+    }
 
     /* ── Native buttons (all variants) ── */
     .stButton > button {
@@ -176,16 +156,6 @@ def inject():
         backdrop-filter: blur(16px) !important;
         box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
     }
-
-    /* ── Metric ── */
-    [data-testid="stMetric"] {
-        background: var(--card) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 10px !important;
-        padding: 16px !important;
-    }
-    [data-testid="stMetricLabel"] { color: var(--muted) !important; font-size: 12px !important; }
-    [data-testid="stMetricValue"] { color: var(--text) !important; font-size: 22px !important; font-weight: 700 !important; }
 
     /* ── Custom table ── */
     .spk-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-top: 14px; }

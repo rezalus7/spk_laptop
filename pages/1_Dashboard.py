@@ -4,38 +4,62 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import theme, state
 from datetime import datetime
 
-st.set_page_config(page_title="Dashboard — SPK Laptop", page_icon="💻", layout="wide", initial_sidebar_state="expanded")
+# Menginisialisasi session state untuk kontrol buka/tutup menu buatan sendiri
+if "show_menu" not in st.session_state:
+    st.session_state.show_menu = True
+
+# Tentukan konfigurasi awal sidebar berdasarkan state menu buatan kita
+sb_state = "expanded" if st.session_state.show_menu else "collapsed"
+
+st.set_page_config(
+    page_title="Dashboard — SPK Laptop", 
+    page_icon="💻", 
+    layout="wide", 
+    initial_sidebar_state=sb_state
+)
+
 theme.inject()
 state.init_state()
 
 if not st.session_state.logged_in:
     st.switch_page("Beranda.py")
 
-# ── Sidebar navigation ────────────────────────────────────
-with st.sidebar:
-    st.markdown(f"""
-    <div style="padding:8px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
-        <div style="font-size:28px; margin-bottom:4px;">💻</div>
-        <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
-        <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
-            {st.session_state.username} &nbsp;·&nbsp;
-            <span style="background:rgba(59,130,246,.15); padding:1px 7px; border-radius:10px;">
-                {st.session_state.role.upper()}
-            </span>
+# ── TOMBOL SAKLAR MENU KUSTOM (Aman untuk PC & HP) ──
+# Tombol ini diletakkan di area atas konten utama
+btn_label = "✖ Tutup Menu" if st.session_state.show_menu else "☰ Buka Menu"
+if st.button(btn_label, key="menu_toggle_btn", type="secondary"):
+    st.session_state.show_menu = not st.session_state.show_menu
+    st.rerun()
+
+# Memberikan ruang kosong di atas agar konten tidak tertutup tombol toggle menu
+st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
+
+# ── Sidebar navigation (Hanya di-render jika show_menu == True) ──
+if st.session_state.show_menu:
+    with st.sidebar:
+        st.markdown(f"""
+        <div style="padding:8px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
+            <div style="font-size:28px; margin-bottom:4px;">💻</div>
+            <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
+            <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
+                {st.session_state.username} &nbsp;·&nbsp;
+                <span style="background:rgba(59,130,246,.15); padding:1px 7px; border-radius:10px;">
+                    {st.session_state.role.upper()}
+                </span>
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    st.page_link("pages/1_Dashboard.py",  label="Dashboard",          use_container_width=True)
-    st.page_link("pages/2_Data_Laptop.py",label="Data Laptop",        use_container_width=True)
-    st.page_link("pages/3_Riwayat.py",    label="Riwayat",            use_container_width=True)
+        st.page_link("pages/1_Dashboard.py",  label="Dashboard",          use_container_width=True)
+        st.page_link("pages/2_Data_Laptop.py",label="Data Laptop",        use_container_width=True)
+        st.page_link("pages/3_Riwayat.py",    label="Riwayat",            use_container_width=True)
 
-    st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
-    st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
-    if st.button("Logout", use_container_width=True, type="secondary"):
-        for k in ["logged_in","username","role"]:
-            st.session_state[k] = "" if k != "logged_in" else False
-        st.switch_page("Beranda.py")
+        st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
+        if st.button("Logout", use_container_width=True, type="secondary"):
+            for k in ["logged_in","username","role"]:
+                st.session_state[k] = "" if k != "logged_in" else False
+            st.switch_page("Beranda.py")
 
 # ── Page header ───────────────────────────────────────────
 state.show_flash()
