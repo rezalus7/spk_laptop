@@ -20,10 +20,18 @@ def inject():
         --soft:     #94a3b8;
     }
 
-    html, body, [class*="css"] {
-        font-family: 'DM Sans', sans-serif !important;
+    /* ── FIX BACKGROUND PUTIH STREAMLIT ── */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"], .main {
         background-color: var(--bg) !important;
         color: var(--text) !important;
+        font-family: 'DM Sans', sans-serif !important;
+    }
+    
+    /* Memastikan teks bawaan di dalam container berwarna terang */
+    [data-testid="stAppViewContainer"] p, 
+    [data-testid="stAppViewContainer"] span, 
+    [data-testid="stAppViewContainer"] label {
+        color: var(--text);
     }
 
     /* ── Hide Streamlit chrome ── */
@@ -37,6 +45,20 @@ def inject():
         border-right: 1px solid rgba(59,130,246,0.1) !important;
     }
     [data-testid="stSidebar"] * { color: var(--text) !important; }
+
+    /* ── PERBAIKAN: AKTIFKAN TOMBOL SIDEBAR KEMBALI ── */
+    /* Membuat tombol pembuka (>) dan penutup (<<) bisa diklik dan berwarna kontras */
+    [data-testid="stSidebarCollapsedControl"] button,
+    section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"],
+    section[data-testid="stSidebar"] button {
+        background-color: var(--card) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        display: flex !important;
+        visibility: visible !important;
+    }
 
     /* ── Native buttons (all variants) ── */
     .stButton > button {
@@ -180,17 +202,6 @@ def inject():
     .info-banner {
         background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.25);
         color: #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 13px;
-    }
-
-    /* ── Force sidebar visible ── */
-    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
-    [data-testid="collapsedControl"] { display: none !important; }
-    button[data-testid="baseButton-header"] { display: none !important; }
-    section[data-testid="stSidebar"] {
-        min-width: 240px !important;
-        width: 240px !important;
-        transform: translateX(0) !important;
-        visibility: visible !important;
     }
 
     /* Sidebar page_link styling */
