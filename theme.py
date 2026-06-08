@@ -81,11 +81,26 @@ def inject():
         background-color: rgba(59,130,246,0.1) !important;
     }
 
-    /* ── SIDEBAR MODERN ── */
+    /* ── SIDEBAR LAYOUT REVISI (ALIGN TO TOP) ── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #05080f 0%, #080c14 100%) !important;
         border-right: 1px solid var(--border) !important;
     }
+    
+    /* Memaksa elemen internal sidebar kustom Anda naik rapat ke atas */
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 2rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        height: 100vh !important;
+    }
+
+    /* Menghilangkan sela/jarak navigasi kosong bawaan Streamlit */
+    [data-testid="stSidebarNav"] {
+        display: none !important;
+    }
+    
     [data-testid="stSidebar"] * { color: var(--text) !important; }
 
     /* Sidebar Link Navigation Kustom */
@@ -98,22 +113,28 @@ def inject():
         font-size: 14px !important;
         font-weight: 500 !important;
         text-decoration: none !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 2px !important;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         border: 1px solid transparent !important;
     }
     [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {
-        background: rgba(59,130,246,0.08) !important;
+        background: rgba(59,130,246,0.06) !important;
         color: var(--accent2) !important;
-        border-color: rgba(59,130,246,0.15) !important;
+        border-color: rgba(59,130,246,0.1) !important;
         transform: translateX(2px);
     }
     /* Menyorot halaman aktif secara halus */
     [data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"] {
-        background: rgba(59,130,246,0.12) !important;
+        background: rgba(59,130,246,0.1) !important;
         color: #fff !important;
-        border-color: rgba(59,130,246,0.3) !important;
+        border-color: rgba(59,130,246,0.25) !important;
         font-weight: 600 !important;
+    }
+
+    /* Otomatis mendorong tombol logout di sidebar ke bagian paling bawah */
+    [data-testid="stSidebar"] .stButton {
+        margin-top: auto !important;
+        padding-bottom: 2.5rem !important;
     }
 
     /* ── NATIVE BUTTONS (GRADIENT & HOVER EFFECTS) ── */
@@ -122,7 +143,7 @@ def inject():
         font-family: 'Plus Jakarta Sans', sans-serif !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        height: 46px !important;
+        height: 44px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         border: none !important;
         letter-spacing: 0.3px !important;
@@ -139,16 +160,18 @@ def inject():
         box-shadow: 0 6px 20px rgba(59,130,246,0.4) !important;
         filter: brightness(1.15);
     }
+    
+    /* Khusus hover tombol logout di sidebar berubah warna merah transparan */
     .stButton > button[kind="secondary"],
     .stButton > button[data-testid="baseButton-secondary"] {
-        background: rgba(20, 29, 46, 0.8) !important;
+        background: rgba(20, 29, 46, 0.5) !important;
         color: var(--soft) !important;
         border: 1px solid var(--border) !important;
     }
     .stButton > button[kind="secondary"]:hover {
-        border-color: var(--accent) !important;
-        color: #fff !important;
-        background: rgba(59,130,246,0.05) !important;
+        border-color: var(--red) !important;
+        color: var(--red) !important;
+        background: rgba(239, 68, 68, 0.05) !important;
         transform: translateY(-1px);
     }
 
