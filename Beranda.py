@@ -217,7 +217,7 @@ with center:
 
     st.markdown("""
     <p style="text-align:center; color:#1e293b; font-size:12px; margin-top:28px; font-family:'Space Mono',monospace;">
-        demo &nbsp;·&nbsp; <span style='color:#334155'>admin / 123</span> &nbsp;|&nbsp; <span style='color:#334155'>mahasiswa / 123</span>
+        demo &nbsp;·&nbsp; <span style='color:#334155'> / </span> &nbsp;|&nbsp; <span style='color:#334155'>/ </span>
     </p>
     """, unsafe_allow_html=True)
 
