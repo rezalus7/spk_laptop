@@ -40,22 +40,44 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# ─── Extra CSS untuk Menghilangkan Tombol Back (<<) ──────
+# ─── Responsive CSS (Fix Tampilan HP vs PC) ──────────────
 st.markdown("""
 <style>
-/* Menyembunyikan tombol panah back / collapse (<<) di sidebar */
+/* ── KONDISI DEFAULT UNTUK PC ── */
+/* Sembunyikan tombol panah collapse (<<) di sidebar */
 [data-testid="stSidebarCollapsedControl"], 
 button[data-testid="baseButton-header"],
 [data-testid="collapsedControl"] {
     display: none !important;
     visibility: hidden !important;
 }
-
-/* Memastikan sidebar terkunci dan tidak bisa di-collapse */
+/* Kunci tombol collapse internal */
 section[data-testid="stSidebar"] button {
     display: none !important;
 }
 
+/* ── KONDISI KHUSUS UNTUK HP / MOBILE LAYAR KECIL (Maksimal Lebar 768px) ── */
+@media (max-width: 768px) {
+    /* Sembunyikan total sidebar di halaman login khusus saat dibuka di HP */
+    [data-testid="stSidebar"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0px !important;
+    }
+    /* Lebarkan container utama agar form login pas di layar HP */
+    [data-testid="stMainBlockContainer"] {
+        max-width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    /* Sesuaikan ukuran judul di HP agar tidak kebesaran */
+    .login-page h1 {
+        font-size: 28px !important;
+        letter-spacing: 6px !important;
+    }
+}
+
+/* ── ANIMASI & STYLE LAINNYA ── */
 @keyframes fadeUp {
     from { opacity:0; transform:translateY(24px); }
     to   { opacity:1; transform:translateY(0); }
@@ -81,14 +103,6 @@ section[data-testid="stSidebar"] button {
     background-clip: text;
     animation: shimmer 3s linear infinite;
 }
-.login-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 20px 0; color: #334155; font-size: 12px;
-}
-.login-divider::before, .login-divider::after {
-    content: ''; flex: 1;
-    height: 1px; background: #1e2d45;
-}
 /* Override form background */
 .login-page [data-testid="stForm"] {
     background: rgba(15,21,34,0.7) !important;
@@ -98,12 +112,10 @@ section[data-testid="stSidebar"] button {
     backdrop-filter: blur(20px) !important;
     box-shadow: 0 24px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03) !important;
 }
-/* Glowing input on focus */
 .login-page [data-testid="stTextInput"] input:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2), 0 0 20px rgba(59,130,246,0.1) !important;
 }
-/* Register button green glow */
 .register-btn .stButton > button {
     background: linear-gradient(135deg, #16a34a, #15803d) !important;
     color: #fff !important;
@@ -118,7 +130,6 @@ section[data-testid="stSidebar"] button {
     box-shadow: 0 8px 32px rgba(22,163,74,0.45) !important;
     transform: translateY(-1px) !important;
 }
-/* Login submit button */
 .login-page [data-testid="stForm"] .stFormSubmitButton > button {
     background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
     border-radius: 12px !important;
@@ -133,7 +144,6 @@ section[data-testid="stSidebar"] button {
     box-shadow: 0 8px 32px rgba(59,130,246,0.5) !important;
     transform: translateY(-1px) !important;
 }
-/* Dot accent bg */
 .dot-bg {
     position: fixed; inset: 0; pointer-events: none; z-index: -1;
     background-image: radial-gradient(circle, rgba(59,130,246,0.06) 1px, transparent 1px);
@@ -151,14 +161,13 @@ section[data-testid="stSidebar"] button {
 # ─── Layout ──────────────────────────────────────────────
 st.markdown('<div class="login-page">', unsafe_allow_html=True)
 
-# Mengembalikan ukuran kolom form ke proporsi semula (1.2) agar pas di tengah
+# Kolom grid seimbang
 _, center, _ = st.columns([1, 1.2, 1])
 
 with center:
-    st.markdown("<div style='height:80px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
     st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
 
-    # Big title above card
     page_label = "LOGIN" if mode == "login" else "DAFTAR AKUN"
     st.markdown(f"""
     <h1 style="
