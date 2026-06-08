@@ -42,12 +42,17 @@ def inject():
     [data-testid="stDecoration"] { display: none !important; }
     .block-container { padding-top: 2rem !important; }
 
-    /* Sembunyikan tombol default collapse bawaan Streamlit (<<) agar tidak bentrok */
+    /* ── PERBAIKAN UTAMA: HAPUS TOMBOL PANAH BAWAAN STREAMLIT (<<) ── */
+    /* Kita hilangkan total tombol bawaan ini agar tidak menghalangi ketukan di HP */
     [data-testid="stSidebarCollapsedControl"], 
     button[aria-label="Collapse sidebar"],
-    [data-testid="collapsedControl"] {
+    [data-testid="collapsedControl"],
+    section[data-testid="stSidebar"] button {
         display: none !important;
         visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0px !important;
+        width: 0px !important;
     }
 
     /* ── Kustomisasi Sidebar Gelap Ber-animasi ── */
