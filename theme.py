@@ -42,7 +42,7 @@ def inject():
     [data-testid="stDecoration"] { display: none !important; }
     .block-container { padding-top: 2rem !important; }
 
-    /* Sembunyikan paksa tombol bawaan collapse Streamlit (<<) agar tidak merusak layout */
+    /* Sembunyikan tombol default collapse bawaan Streamlit (<<) agar tidak bentrok */
     [data-testid="stSidebarCollapsedControl"], 
     button[aria-label="Collapse sidebar"],
     [data-testid="collapsedControl"] {
@@ -50,22 +50,23 @@ def inject():
         visibility: hidden !important;
     }
 
-    /* ── Kustomisasi Sidebar Gelap ── */
+    /* ── Kustomisasi Sidebar Gelap Ber-animasi ── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
         border-right: 1px solid rgba(59,130,246,0.1) !important;
+        transition: transform 0.3s ease, cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stSidebar"] * { color: var(--text) !important; }
 
-    /* ── Kustomisasi Style untuk Tombol Menu Toggle ── */
+    /* ── Posisi Tombol Menu Toggle Mengambang ── */
     div.element-container:has(button[key="menu_toggle_btn"]) {
         position: fixed;
         top: 16px;
         left: 16px;
-        z-index: 999999;
+        z-index: 999999 !important;
     }
 
-    /* ── Native buttons (all variants) ── */
+    /* ── Native buttons ── */
     .stButton > button {
         border-radius: 8px !important;
         font-family: 'DM Sans', sans-serif !important;

@@ -4,18 +4,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import theme, state
 from datetime import datetime
 
-# Menginisialisasi session state untuk kontrol buka/tutup menu buatan sendiri
+# Inisialisasi session state menu kustom agar bertahan saat halaman pindah
 if "show_menu" not in st.session_state:
     st.session_state.show_menu = True
 
-# Tentukan konfigurasi awal sidebar berdasarkan state menu buatan kita
-sb_state = "expanded" if st.session_state.show_menu else "collapsed"
-
+# Biarkan initial_sidebar_state selalu "expanded" agar data halaman di dalamnya tidak hilang sistem [cite: 120]
 st.set_page_config(
     page_title="Dashboard — SPK Laptop", 
     page_icon="💻", 
     layout="wide", 
-    initial_sidebar_state=sb_state
+    initial_sidebar_state="expanded"
 )
 
 theme.inject()
@@ -24,42 +22,68 @@ state.init_state()
 if not st.session_state.logged_in:
     st.switch_page("Beranda.py")
 
-# ── TOMBOL SAKLAR MENU KUSTOM (Aman untuk PC & HP) ──
-# Tombol ini diletakkan di area atas konten utama
-btn_label = "✖ Tutup Menu" if st.session_state.show_menu else "☰ Buka Menu"
+# ── KONTROL CSS SEMBUNYI/MUNCUL SIDEBAR SECARA MANUAL ──
+if not st.session_state.show_menu:
+    st.markdown("""
+    <style>
+    /* Jika menu disembunyikan, geser sidebar keluar layar dan lebarkan konten utama */
+    [data-testid="stSidebar"] {
+        transform: translateX(-300px) !important;
+        width: 0px !important;
+        min-width: 0px !important;
+    }
+    [data-testid="stMainBlockContainer"] {
+        margin-left: 0px !important;
+        max-width: 100% !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <style>
+    /* Jika menu dibuka, kembalikan posisi normal sidebar */
+    [data-testid="stSidebar"] {
+        transform: translateX(0px) !important;
+        min-width: 244px !important;
+        width: 244px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# ── TOMBOL SAKLAR MENU KUSTOM (PC & HP) ──
+btn_label = "✖ Tutup Menu" if st.session_state.show_menu else "☰ Menu"
 if st.button(btn_label, key="menu_toggle_btn", type="secondary"):
     st.session_state.show_menu = not st.session_state.show_menu
     st.rerun()
 
-# Memberikan ruang kosong di atas agar konten tidak tertutup tombol toggle menu
-st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
+# Jarak aman konten utama agar tidak tertimpa tombol menu floating
+st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
 
-# ── Sidebar navigation (Hanya di-render jika show_menu == True) ──
-if st.session_state.show_menu:
-    with st.sidebar:
-        st.markdown(f"""
-        <div style="padding:8px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
-            <div style="font-size:28px; margin-bottom:4px;">💻</div>
-            <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
-            <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
-                {st.session_state.username} &nbsp;·&nbsp;
-                <span style="background:rgba(59,130,246,.15); padding:1px 7px; border-radius:10px;">
-                    {st.session_state.role.upper()}
-                </span>
-            </div>
+# ── Sidebar Content (Selalu di-render agar sistem Streamlit tidak menghapus daftar halamannya) ──
+with st.sidebar:
+    st.markdown(f"""
+    <div style="padding:8px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
+        <div style="font-size:28px; margin-bottom:4px;">💻</div>
+        <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
+        <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
+            {st.session_state.username} &nbsp;·&nbsp;
+            <span style="background:rgba(59,130,246,.15); padding:1px 7px; border-radius:10px;">
+                {st.session_state.role.upper()}
+            </span>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-        st.page_link("pages/1_Dashboard.py",  label="Dashboard",          use_container_width=True)
-        st.page_link("pages/2_Data_Laptop.py",label="Data Laptop",        use_container_width=True)
-        st.page_link("pages/3_Riwayat.py",    label="Riwayat",            use_container_width=True)
+    st.page_link("pages/1_Dashboard.py",  label="Dashboard",          use_container_width=True)
+    st.page_link("pages/2_Data_Laptop.py",label="Data Laptop",        use_container_width=True)
+    st.page_link("pages/3_Riwayat.py",    label="Riwayat",            use_container_width=True)
 
-        st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
-        st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
-        if st.button("Logout", use_container_width=True, type="secondary"):
-            for k in ["logged_in","username","role"]:
-                st.session_state[k] = "" if k != "logged_in" else False
-            st.switch_page("Beranda.py")
+    st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
+    if st.button("Logout", use_container_width=True, type="secondary"):
+        for k in ["logged_in","username","role"]:
+            st.session_state[k] = "" if k != "logged_in" else False
+        st.switch_page("Beranda.py")
 
 # ── Page header ───────────────────────────────────────────
 state.show_flash()
