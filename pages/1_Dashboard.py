@@ -4,16 +4,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import theme, state
 from datetime import datetime
 
-# Inisialisasi session state menu kustom agar bertahan saat halaman pindah
+# Menggunakan state internal untuk menyimpan status buka/tutup menu kustom
 if "show_menu" not in st.session_state:
     st.session_state.show_menu = True
 
-# Biarkan initial_sidebar_state selalu "expanded" agar data halaman di dalamnya tidak hilang sistem [cite: 120]
+# Kunci state sidebar bawaan agar selalu mengikuti status menu buatan kita
+sb_state = "expanded" if st.session_state.show_menu else "collapsed"
+
 st.set_page_config(
     page_title="Dashboard — SPK Laptop", 
     page_icon="💻", 
     layout="wide", 
-    initial_sidebar_state="expanded"
+    initial_sidebar_state=sb_state
 )
 
 theme.inject()
@@ -22,47 +24,15 @@ state.init_state()
 if not st.session_state.logged_in:
     st.switch_page("Beranda.py")
 
-# ── KONTROL CSS SEMBUNYI/MUNCUL SIDEBAR SECARA MANUAL ──
-if not st.session_state.show_menu:
-    st.markdown("""
-    <style>
-    /* Jika menu disembunyikan, geser sidebar keluar layar dan lebarkan konten utama */
-    [data-testid="stSidebar"] {
-        transform: translateX(-300px) !important;
-        width: 0px !important;
-        min-width: 0px !important;
-    }
-    [data-testid="stMainBlockContainer"] {
-        margin-left: 0px !important;
-        max-width: 100% !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <style>
-    /* Jika menu dibuka, kembalikan posisi normal sidebar */
-    [data-testid="stSidebar"] {
-        transform: translateX(0px) !important;
-        min-width: 244px !important;
-        width: 244px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# ── TOMBOL SAKLAR MENU KUSTOM (PC & HP) ──
-btn_label = "✖ Tutup Menu" if st.session_state.show_menu else "☰ Menu"
-if st.button(btn_label, key="menu_toggle_btn", type="secondary"):
-    st.session_state.show_menu = not st.session_state.show_menu
-    st.rerun()
-
-# Jarak aman konten utama agar tidak tertimpa tombol menu floating
-st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-
-# ── Sidebar Content (Selalu di-render agar sistem Streamlit tidak menghapus daftar halamannya) ──
+# ── LOGIKA SIDEBAR KUSTOM (Aman 100% di HP & PC) ──
 with st.sidebar:
+    # Letakkan tombol penutup menu kustom di posisi paling atas dalam sidebar
+    if st.button("✖ Tutup Menu Navigasi", use_container_width=True, type="secondary"):
+        st.session_state.show_menu = False
+        st.rerun()
+        
     st.markdown(f"""
-    <div style="padding:8px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
+    <div style="padding:12px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
         <div style="font-size:28px; margin-bottom:4px;">💻</div>
         <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
         <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
@@ -84,6 +54,14 @@ with st.sidebar:
         for k in ["logged_in","username","role"]:
             st.session_state[k] = "" if k != "logged_in" else False
         st.switch_page("Beranda.py")
+
+# ── TOMBOL BUKA MENU (Hanya muncul jika sidebar sedang tertutup) ──
+if not st.session_state.show_menu:
+    st.markdown('<div class="menu-container">', unsafe_allow_html=True)
+    if st.button("☰ Buka Menu Navigasi", type="secondary"):
+        st.session_state.show_menu = True
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Page header ───────────────────────────────────────────
 state.show_flash()

@@ -40,10 +40,9 @@ def inject():
         visibility: hidden !important; 
     }
     [data-testid="stDecoration"] { display: none !important; }
-    .block-container { padding-top: 2rem !important; }
+    .block-container { padding-top: 1.5rem !important; }
 
-    /* ── PERBAIKAN UTAMA: HAPUS TOMBOL PANAH BAWAAN STREAMLIT (<<) ── */
-    /* Kita hilangkan total tombol bawaan ini agar tidak menghalangi ketukan di HP */
+    /* Hapus total tombol collapse bawaan asli (<<) agar tidak mengganggu ketukan jari di HP */
     [data-testid="stSidebarCollapsedControl"], 
     button[aria-label="Collapse sidebar"],
     [data-testid="collapsedControl"],
@@ -51,24 +50,18 @@ def inject():
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
-        height: 0px !important;
-        width: 0px !important;
     }
 
-    /* ── Kustomisasi Sidebar Gelap Ber-animasi ── */
+    /* ── Style Menu Sidebar Kustom Gelap ── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
         border-right: 1px solid rgba(59,130,246,0.1) !important;
-        transition: transform 0.3s ease, cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-testid="stSidebar"] * { color: var(--text) !important; }
 
-    /* ── Posisi Tombol Menu Toggle Mengambang ── */
-    div.element-container:has(button[key="menu_toggle_btn"]) {
-        position: fixed;
-        top: 16px;
-        left: 16px;
-        z-index: 999999 !important;
+    /* Desain tombol menu buka/tutup kustom agar terlihat modern */
+    .menu-container {
+        margin-bottom: 20px;
     }
 
     /* ── Native buttons ── */
