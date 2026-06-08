@@ -34,24 +34,42 @@ def inject():
         color: var(--text);
     }
 
-    /* ── Hide Streamlit chrome ── */
-    #MainMenu, footer, header { visibility: hidden !important; }
+    /* ── Hide Streamlit chrome (Kecuali tombol pembuka sidebar) ── */
+    #MainMenu, footer { visibility: hidden !important; }
     [data-testid="stDecoration"] { display: none !important; }
     .block-container { padding-top: 1.5rem !important; }
 
-    /* ── Sidebar ── */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
-        border-right: 1px solid rgba(59,130,246,0.1) !important;
+    /* ── PERBAIKAN HEADER & TOMBOL PEMBUKA SIDEBAR (>) ── */
+    /* Pastikan header pembuka sidebar tetap terlihat dan transparan */
+    header[data-testid="stHeader"] {
+        visibility: visible !important;
+        background: transparent !important;
     }
-    [data-testid="stSidebar"] * { color: var(--text) !important; }
+    /* Sembunyikan tombol default lain di header jika ada, kecuali tombol pembuka sidebar */
+    header[data-testid="stHeader"] button:not([data-testid="stSidebarCollapsedControl"]) {
+        display: none !important;
+    }
 
-    /* ── PERBAIKAN: AKTIFKAN TOMBOL SIDEBAR KEMBALI ── */
-    /* Membuat tombol pembuka (>) dan penutup (<<) bisa diklik dan berwarna kontras */
-    [data-testid="stSidebarCollapsedControl"] button,
+    /* Tampilan tombol pembuka kembali (>) saat posisi tertutup */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: block !important;
+        visibility: visible !important;
+        left: 10px !important;
+        top: 10px !important;
+    }
+    [data-testid="stSidebarCollapsedControl"] button {
+        background-color: var(--card) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        padding: 4px !important;
+        cursor: pointer !important;
+    }
+
+    /* ── Tampilan tombol penutup (<<) di dalam sidebar ── */
     section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"],
     section[data-testid="stSidebar"] button {
-        background-color: var(--card) !important;
+        background-color: rgba(255,255,255,0.05) !important;
         color: var(--text) !important;
         border: 1px solid var(--border) !important;
         border-radius: 8px !important;
@@ -59,6 +77,13 @@ def inject():
         display: flex !important;
         visibility: visible !important;
     }
+
+    /* ── Sidebar Background ── */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
+        border-right: 1px solid rgba(59,130,246,0.1) !important;
+    }
+    [data-testid="stSidebar"] * { color: var(--text) !important; }
 
     /* ── Native buttons (all variants) ── */
     .stButton > button {
