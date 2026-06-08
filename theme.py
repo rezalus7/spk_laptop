@@ -34,98 +34,61 @@ def inject():
         color: var(--text);
     }
 
-    /* ── Hide Streamlit chrome ── */
-    #MainMenu, footer { visibility: hidden !important; }
+    /* ── SEMBUNYIKAN TOTAL SIDEBAR BAWAAN ── */
+    /* Kita hilangkan total sidebar bawaan agar tampilan di HP bersih 100% */
+    [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"], 
+    button[data-testid="baseButton-header"], [data-testid="collapsedControl"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0px !important;
+    }
+
+    #MainMenu, footer, header { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
     
-    /* Berikan padding atas yang aman agar tidak menabrak header */
-    .block-container { padding-top: 3.5rem !important; }
-
-    /* ── KUSTOMISASI HEADER & TOMBOL SIDEBAR BAWAAN (FIX HP) ── */
-    /* Pastikan bar header atas tetap muncul secara transparan */
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        visibility: visible !important;
-        display: flex !important;
-        height: 50px !important;
+    /* Atur jarak atas halaman utama agar pas */
+    .block-container { 
+        padding-top: 2rem !important; 
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 
-    /* Sembunyikan elemen dekoratif bawaan lain di header jika ada */
-    header[data-testid="stHeader"] button:not([data-testid="stSidebarCollapsedControl"]) {
-        display: none !important;
+    /* ── KUSTOM NAVIGASI HEADER ATAS (UI MODERN) ── */
+    .custom-nav {
+        display: flex;
+        gap: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        align-items: center;
+        flex-wrap: wrap;
     }
-
-    /* KUSTOMISASI TOMBOL PEMBUKA SIDEBAR (>) AGAR BESAR DAN RESPONSIF DI HP */
-    [data-testid="stSidebarCollapsedControl"] {
-        display: block !important;
-        visibility: visible !important;
-        position: fixed !important;
-        top: 12px !important;
-        left: 12px !important;
-        z-index: 999999 !important;
+    .custom-nav-brand {
+        font-weight: 700;
+        color: #fff;
+        margin-right: auto;
+        font-size: 14px;
+        letter-spacing: 1px;
     }
-    
-    [data-testid="stSidebarCollapsedControl"] button {
-        background-color: var(--card) !important;
-        color: var(--accent) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 10px !important;
-        width: 44px !important;
-        height: 44px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-        cursor: pointer !important;
-    }
-    
-    [data-testid="stSidebarCollapsedControl"] button svg {
-        width: 24px !important;
-        height: 24px !important;
-        fill: var(--accent) !important;
-    }
-
-    /* KUSTOMISASI TOMBOL PENUTUP SIDEBAR (<<) DI DALAM MENU */
-    section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"] {
-        background-color: rgba(255,255,255,0.05) !important;
-        color: var(--text) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
-        width: 38px !important;
-        height: 38px !important;
-        margin-top: 4px !important;
-        cursor: pointer !important;
-    }
-
-    /* ── Style Menu Sidebar ── */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0a1120 0%, #080c14 100%) !important;
-        border-right: 1px solid rgba(59,130,246,0.1) !important;
-    }
-    [data-testid="stSidebar"] * { color: var(--text) !important; }
 
     /* ── Native buttons ── */
     .stButton > button {
         border-radius: 8px !important;
         font-family: 'DM Sans', sans-serif !important;
         font-weight: 600 !important;
-        font-size: 14px !important;
-        height: 44px !important;
+        font-size: 13px !important;
+        height: 38px !important;
         transition: all .15s ease !important;
         border: none !important;
     }
-    .stButton > button[kind="primary"],
-    .stButton > button[data-testid="baseButton-primary"] {
+    .stButton > button[kind="primary"] {
         background: var(--accent) !important;
         color: #fff !important;
     }
-    .stButton > button[kind="primary"]:hover,
-    .stButton > button[data-testid="baseButton-primary"]:hover {
-        background: #2563eb !important;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.25) !important;
-    }
-    .stButton > button[kind="secondary"],
-    .stButton > button[data-testid="baseButton-secondary"] {
+    .stButton > button[kind="secondary"] {
         background: var(--card) !important;
         color: var(--soft) !important;
         border: 1px solid var(--border) !important;
@@ -135,53 +98,14 @@ def inject():
         color: var(--accent) !important;
     }
 
-    /* ── Text inputs ── */
-    [data-testid="stTextInput"] input,
-    [data-testid="stNumberInput"] input {
-        background: var(--card) !important;
-        border: 1px solid var(--border) !important;
-        color: var(--text) !important;
-        border-radius: 8px !important;
-        height: 44px !important;
-        font-size: 14px !important;
-    }
-
-    /* ── Selectbox ── */
-    [data-testid="stSelectbox"] > div > div {
-        background: var(--card) !important;
-        border: 1px solid var(--border) !important;
-        color: var(--text) !important;
-        border-radius: 8px !important;
-    }
-
-    /* ── Sliders ── */
+    /* ── Sliders & Inputs ── */
     [data-testid="stSlider"] label { color: var(--soft) !important; font-size: 13px !important; }
     [data-testid="stSlider"] [data-testid="stThumbValue"] { color: var(--accent) !important; }
-
-    /* ── Tabs ── */
-    [data-testid="stTabs"] [data-baseweb="tab-list"] {
-        background: var(--surface) !important;
-        border-radius: 10px !important;
-        padding: 4px !important;
-        gap: 4px !important;
+    [data-testid="stTextInput"] input, [data-testid="stNumberInput"] input {
+        background: var(--card) !important;
         border: 1px solid var(--border) !important;
-    }
-    [data-testid="stTabs"] [data-baseweb="tab"] {
-        background: transparent !important;
-        color: var(--muted) !important;
-        border-radius: 7px !important;
-        font-weight: 500 !important;
-        font-size: 13px !important;
-    }
-
-    /* ── Forms ── */
-    [data-testid="stForm"] {
-        background: rgba(20,29,46,0.8) !important;
-        border: 1px solid rgba(59,130,246,0.12) !important;
-        border-radius: 20px !important;
-        padding: 28px 24px !important;
-        backdrop-filter: blur(16px) !important;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
+        color: var(--text) !important;
+        border-radius: 8px !important;
     }
 
     /* ── Custom table ── */
@@ -193,6 +117,9 @@ def inject():
         white-space: nowrap; text-align: left;
     }
     .spk-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .spk-table tr.r-even td { background: var(--bg); }
+    .spk-table tr.r-odd  td { background: var(--card); }
+    .spk-table tr.r-best td { background: #0a2218; color: var(--green); font-weight: 700; }
     .tc { text-align: center !important; }
 
     /* ── Best result card ── */
@@ -201,31 +128,16 @@ def inject():
         border: 1px solid var(--green);
         border-radius: 12px; padding: 18px 22px; margin: 16px 0;
     }
+    .best-result .title { color: var(--green); font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .best-result .badge {
+        display: inline-block; background: rgba(34,197,94,.15);
+        color: var(--green); font-size: 11px; font-weight: 700;
+        padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; letter-spacing: .5px;
+    }
 
     /* ── Section header ── */
-    .section-title {
-        color: var(--text); font-size: 20px; font-weight: 700;
-        letter-spacing: -.3px; margin: 0 0 4px 0;
-    }
+    .section-title { color: var(--text); font-size: 20px; font-weight: 700; margin: 0 0 4px 0; }
     .section-sub { color: var(--muted); font-size: 13px; margin: 0 0 20px 0; }
-
-    /* Sidebar page_link styling */
-    [data-testid="stSidebar"] [data-testid="stPageLink"] a {
-        display: flex !important;
-        align-items: center !important;
-        padding: 10px 14px !important;
-        border-radius: 8px !important;
-        color: #94a3b8 !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        text-decoration: none !important;
-        margin-bottom: 4px !important;
-        transition: all .15s ease !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {
-        background: rgba(59,130,246,.1) !important;
-        color: #60a5fa !important;
-    }
 
     /* ── Stat mini cards grid ── */
     .mini-grid { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
@@ -234,5 +146,8 @@ def inject():
         background: var(--card); border: 1px solid var(--border);
         border-radius: 10px; padding: 12px 16px;
     }
+    .mini-card .lbl { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .mini-card .val { color: var(--text); font-size: 17px; font-weight: 700; margin-top: 3px; }
+    .mini-card .val.accent { color: var(--accent); }
     </style>
     """, unsafe_allow_html=True)

@@ -4,45 +4,45 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import theme, state
 from datetime import datetime
 
-# Kembalikan ke pengaturan awal Streamlit yang stabil
-st.set_page_config(
-    page_title="Dashboard — SPK Laptop", 
-    page_icon="💻", 
-    layout="wide", 
-    initial_sidebar_state="auto"
-)
-
+# Paksa sidebar bawaan collapse total agar space halaman luas
+st.set_page_config(page_title="Dashboard — SPK Laptop", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
 theme.inject()
 state.init_state()
 
 if not st.session_state.logged_in:
     st.switch_page("Beranda.py")
 
-# ── Sidebar Content Resmi Bawaan Streamlit ──
-with st.sidebar:
+# ─── NAVIGATION BAR ATAS MODERN (GANTI SIDEBAR) ───
+# Navigasi ini menggantikan sidebar agar aman dibuka di device apa saja
+nav_cols = st.columns([1.5, 1, 1, 1, 1])
+
+with nav_cols[0]:
     st.markdown(f"""
-    <div style="padding:40px 0 20px 0; border-bottom:1px solid #1e2d45; margin-bottom:16px;">
-        <div style="font-size:28px; margin-bottom:4px;">💻</div>
-        <div style="color:#e2e8f0; font-weight:700; font-size:16px;">SPK Laptop</div>
-        <div style="color:#60a5fa; font-size:12px; margin-top:2px;">
-            {st.session_state.username} &nbsp;·&nbsp;
-            <span style="background:rgba(59,130,246,.15); padding:1px 7px; border-radius:10px;">
-                {st.session_state.role.upper()}
-            </span>
-        </div>
+    <div style="padding-top: 6px;">
+        <span style="font-weight:800; font-size:16px; color:#fff; letter-spacing:1px;">💻 SPK LAPTOP</span>
+        <span style="font-size:11px; color:#60a5fa; margin-left:6px;">({st.session_state.username})</span>
     </div>
     """, unsafe_allow_html=True)
 
-    st.page_link("pages/1_Dashboard.py",  label="Dashboard",          use_container_width=True)
-    st.page_link("pages/2_Data_Laptop.py",label="Data Laptop",        use_container_width=True)
-    st.page_link("pages/3_Riwayat.py",    label="Riwayat",            use_container_width=True)
+with nav_cols[1]:
+    if st.button("📊 Dashboard", use_container_width=True, type="primary"):
+        st.switch_page("pages/1_Dashboard.py")
 
-    st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
-    st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
-    if st.button("Logout", use_container_width=True, type="secondary"):
+with nav_cols[2]:
+    if st.button("📋 Data Laptop", use_container_width=True, type="secondary"):
+        st.switch_page("pages/2_Data_Laptop.py")
+
+with nav_cols[3]:
+    if st.button("🕐 Riwayat", use_container_width=True, type="secondary"):
+        st.switch_page("pages/3_Riwayat.py")
+
+with nav_cols[4]:
+    if st.button("🚪 Keluar", use_container_width=True, type="secondary"):
         for k in ["logged_in","username","role"]:
             st.session_state[k] = "" if k != "logged_in" else False
         st.switch_page("Beranda.py")
+
+st.markdown("<hr style='border-color:#1e2d45; margin:16px 0 24px 0;'>", unsafe_allow_html=True)
 
 # ── Page header ───────────────────────────────────────────
 state.show_flash()
