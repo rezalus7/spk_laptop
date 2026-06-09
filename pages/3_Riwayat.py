@@ -2,7 +2,7 @@ import streamlit as st
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import theme, state
-import io
+import io, base64
 from datetime import datetime
 
 st.set_page_config(page_title="Riwayat — SPK Laptop", page_icon="🕐", layout="wide", initial_sidebar_state="expanded")
@@ -12,143 +12,221 @@ state.init_state()
 if not st.session_state.logged_in:
     st.switch_page("Beranda.py")
 
-# ── PDF Generator ─────────────────────────────────────────
-def generate_pdf_riwayat(history, username, role):
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.units import mm
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+# ── PDF Generator (pure Python, no external lib) ──────────
+def generate_pdf_bytes(history, username, role):
+    """
+    Buat PDF sederhana pakai struktur bytes langsung (tanpa library eksternal).
+    Menggunakan fpdf2 jika ada, fallback ke HTML-based download jika tidak.
+    """
+    try:
+        from fpdf import FPDF
+        _use_fpdf = True
+    except ImportError:
+        _use_fpdf = False
 
-    buffer = io.BytesIO()
-    W, H = A4
-    doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        rightMargin=20*mm, leftMargin=20*mm,
-        topMargin=20*mm, bottomMargin=20*mm,
-    )
-    styles = getSampleStyleSheet()
+    if _use_fpdf:
+        return _pdf_fpdf(history, username, role)
+    else:
+        return None  # akan pakai HTML fallback
 
-    title_style = ParagraphStyle('CT', parent=styles['Normal'], fontSize=18,
-        fontName='Helvetica-Bold', textColor=colors.HexColor('#1e3a5f'),
-        alignment=TA_CENTER, spaceAfter=4)
-    subtitle_style = ParagraphStyle('CS', parent=styles['Normal'], fontSize=10,
-        fontName='Helvetica', textColor=colors.HexColor('#64748b'),
-        alignment=TA_CENTER, spaceAfter=2)
-    meta_style = ParagraphStyle('CM', parent=styles['Normal'], fontSize=9,
-        fontName='Helvetica', textColor=colors.HexColor('#475569'),
-        alignment=TA_LEFT, spaceAfter=3)
-    section_style = ParagraphStyle('CSec', parent=styles['Normal'], fontSize=11,
-        fontName='Helvetica-Bold', textColor=colors.HexColor('#1e40af'), spaceAfter=6)
-    footer_style = ParagraphStyle('CF', parent=styles['Normal'], fontSize=8,
-        textColor=colors.HexColor('#94a3b8'), alignment=TA_CENTER)
+def _pdf_fpdf(history, username, role):
+    from fpdf import FPDF
 
-    story = []
+    class PDF(FPDF):
+        def header(self):
+            self.set_fill_color(30, 58, 95)
+            self.rect(0, 0, 210, 28, 'F')
+            self.set_font('Helvetica', 'B', 16)
+            self.set_text_color(255, 255, 255)
+            self.set_y(7)
+            self.cell(0, 8, 'SPK LAPTOP - METODE SMART', align='C', new_x='LMARGIN', new_y='NEXT')
+            self.set_font('Helvetica', '', 9)
+            self.set_text_color(148, 163, 184)
+            self.cell(0, 6, 'Sistem Pendukung Keputusan Pemilihan Laptop', align='C', new_x='LMARGIN', new_y='NEXT')
+            self.ln(4)
 
-    # ── Header ─────────────────────────────────────────────
-    story.append(Paragraph("SPK LAPTOP — METODE SMART", title_style))
-    story.append(Paragraph("Sistem Pendukung Keputusan Pemilihan Laptop", subtitle_style))
-    story.append(Spacer(1, 4))
-    story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#3b82f6')))
-    story.append(Spacer(1, 8))
+        def footer(self):
+            self.set_y(-12)
+            self.set_font('Helvetica', 'I', 8)
+            self.set_text_color(148, 163, 184)
+            self.cell(0, 10, f'Halaman {self.page_no()} | Digenerate otomatis oleh SPK Laptop', align='C')
 
-    # ── Meta info ──────────────────────────────────────────
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_margins(15, 32, 15)
+
     now_str = datetime.now().strftime("%d %B %Y, %H:%M:%S")
-    story.append(Paragraph("Laporan Riwayat Analisis", section_style))
-    story.append(Paragraph(f"Dicetak oleh : <b>{username}</b> ({role.upper()})", meta_style))
-    story.append(Paragraph(f"Tanggal cetak: {now_str}", meta_style))
-    story.append(Paragraph(f"Total data   : <b>{len(history)}</b> analisis", meta_style))
-    story.append(Spacer(1, 10))
 
-    # ── Summary stats ──────────────────────────────────────
+    # Meta info
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.set_text_color(30, 64, 175)
+    pdf.cell(0, 7, 'Laporan Riwayat Analisis', new_x='LMARGIN', new_y='NEXT')
+    pdf.set_draw_color(59, 130, 246)
+    pdf.set_line_width(0.4)
+    pdf.line(15, pdf.get_y(), 195, pdf.get_y())
+    pdf.ln(3)
+
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(71, 85, 105)
+    pdf.cell(0, 5, f'Dicetak oleh : {username} ({role.upper()})', new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 5, f'Tanggal cetak: {now_str}', new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 5, f'Total data   : {len(history)} analisis', new_x='LMARGIN', new_y='NEXT')
+    pdf.ln(5)
+
+    # Summary stats
     if history:
         unique_laptops = len(set(h["laptop"] for h in history))
         avg_budget = sum(h["budget"] for h in history) // len(history)
         best = max(history, key=lambda x: x["skor"])
 
-        stat_data = [
-            ["Total Pencarian", "Laptop Unik", "Rata-rata Budget", "Skor Terbaik"],
-            [str(len(history)), str(unique_laptops), f"Rp {avg_budget:,}", str(best["skor"])],
+        stats = [
+            ("Total Pencarian", str(len(history))),
+            ("Laptop Unik", str(unique_laptops)),
+            ("Rata-rata Budget", f"Rp {avg_budget:,}"),
+            ("Skor Terbaik", str(best["skor"])),
         ]
-        cw = (W - 40*mm) / 4
-        stat_tbl = Table(stat_data, colWidths=[cw]*4)
-        stat_tbl.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1e3a5f')),
-            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0,0), (-1,0), 9),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('ROWHEIGHT', (0,0), (-1,-1), 24),
-            ('BACKGROUND', (0,1), (-1,1), colors.HexColor('#eff6ff')),
-            ('TEXTCOLOR', (0,1), (-1,1), colors.HexColor('#1e40af')),
-            ('FONTNAME', (0,1), (-1,1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0,1), (-1,1), 12),
-            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#bfdbfe')),
-        ]))
-        story.append(stat_tbl)
-        story.append(Spacer(1, 16))
+        col_w = 180 / 4
+        pdf.set_font('Helvetica', 'B', 8)
+        pdf.set_fill_color(30, 58, 95)
+        pdf.set_text_color(255, 255, 255)
+        for lbl, _ in stats:
+            pdf.cell(col_w, 7, lbl, border=1, align='C', fill=True)
+        pdf.ln()
+        pdf.set_font('Helvetica', 'B', 11)
+        pdf.set_fill_color(239, 246, 255)
+        pdf.set_text_color(30, 64, 175)
+        for _, val in stats:
+            pdf.cell(col_w, 9, val, border=1, align='C', fill=True)
+        pdf.ln(12)
 
-    # ── Main table ─────────────────────────────────────────
-    story.append(Paragraph("Detail Riwayat Analisis", section_style))
+    # Table header
+    pdf.set_font('Helvetica', 'B', 9)
+    pdf.set_text_color(30, 64, 175)
+    pdf.cell(0, 6, 'Detail Riwayat Analisis', new_x='LMARGIN', new_y='NEXT')
+    pdf.set_draw_color(59, 130, 246)
+    pdf.line(15, pdf.get_y(), 195, pdf.get_y())
+    pdf.ln(3)
 
-    col_widths = [10*mm, 22*mm, 28*mm, 14*mm, 14*mm, 14*mm, 14*mm, 43*mm, 12*mm]
-    header = ["No", "User", "Budget", "Min\nProc", "Min\nRAM", "Min\nStor", "Min\nBat", "Rekomendasi", "Skor"]
-    table_data = [header]
+    cols      = ["No","User","Budget","Proc","RAM","Stor","Bat","Rekomendasi","Skor"]
+    col_widths = [8, 22, 28, 12, 14, 14, 14, 52, 16]
 
+    pdf.set_font('Helvetica', 'B', 7.5)
+    pdf.set_fill_color(30, 58, 95)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_draw_color(203, 213, 225)
+    pdf.set_line_width(0.3)
+    for c, w in zip(cols, col_widths):
+        pdf.cell(w, 7, c, border=1, align='C', fill=True)
+    pdf.ln()
+
+    pdf.set_font('Helvetica', '', 7.5)
     for i, d in enumerate(reversed(history), 1):
-        table_data.append([
-            str(i),
-            d["user"],
-            f"Rp {d['budget']:,}",
-            str(d["min_proc"]),
-            f"{d['min_ram']} GB",
-            f"{d['min_storage']} GB",
-            str(d["min_battery"]),
-            d["laptop"],
-            str(d["skor"]),
-        ])
+        fill = i % 2 == 0
+        pdf.set_fill_color(248, 250, 252) if fill else pdf.set_fill_color(255, 255, 255)
 
-    tbl = Table(table_data, colWidths=col_widths, repeatRows=1)
-    row_styles = [
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1e3a5f')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,0), 8),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
-        ('FONTSIZE', (0,1), (-1,-1), 7.5),
-        ('ROWHEIGHT', (0,0), (-1,-1), 18),
-        ('GRID', (0,0), (-1,-1), 0.4, colors.HexColor('#cbd5e1')),
-        ('LEFTPADDING', (0,0), (-1,-1), 4),
-        ('RIGHTPADDING', (0,0), (-1,-1), 4),
-        ('ALIGN', (7,1), (7,-1), 'LEFT'),
-        ('ALIGN', (2,1), (2,-1), 'LEFT'),
-    ]
-    for r in range(1, len(table_data)):
-        bg = colors.HexColor('#f8fafc') if r % 2 == 0 else colors.white
-        row_styles.append(('BACKGROUND', (0,r), (-1,r), bg))
-        row_styles.append(('TEXTCOLOR', (8,r), (8,r), colors.HexColor('#1d4ed8')))
-        row_styles.append(('FONTNAME', (8,r), (8,r), 'Helvetica-Bold'))
-        row_styles.append(('TEXTCOLOR', (7,r), (7,r), colors.HexColor('#15803d')))
+        row = [
+            str(i), d["user"], f"Rp {d['budget']:,}",
+            str(d["min_proc"]), f"{d['min_ram']}G", f"{d['min_storage']}G",
+            str(d["min_battery"]), d["laptop"], str(d["skor"]),
+        ]
+        aligns = ['C','L','L','C','C','C','C','L','C']
+        for j, (val, w, al) in enumerate(zip(row, col_widths, aligns)):
+            if j == 7:  # rekomendasi — hijau
+                pdf.set_text_color(21, 128, 61)
+                pdf.set_font('Helvetica', 'B', 7.5)
+            elif j == 8:  # skor — biru
+                pdf.set_text_color(29, 78, 216)
+                pdf.set_font('Helvetica', 'B', 7.5)
+            else:
+                pdf.set_text_color(51, 65, 85)
+                pdf.set_font('Helvetica', '', 7.5)
+            pdf.cell(w, 6.5, val, border=1, align=al, fill=fill)
+        pdf.ln()
 
-    tbl.setStyle(TableStyle(row_styles))
-    story.append(tbl)
+    return bytes(pdf.output())
 
-    # ── Footer ─────────────────────────────────────────────
-    story.append(Spacer(1, 20))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#cbd5e1')))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(
-        "Dokumen ini digenerate otomatis oleh Sistem SPK Laptop — Metode SMART",
-        footer_style,
-    ))
 
-    doc.build(story)
-    buffer.seek(0)
-    return buffer.getvalue()
+def generate_html_report(history, username, role):
+    """Fallback: buat HTML yang bisa diprint/save sebagai PDF dari browser."""
+    now_str = datetime.now().strftime("%d %B %Y, %H:%M:%S")
+    rows_html = ""
+    for i, d in enumerate(reversed(history), 1):
+        bg = "#f8fafc" if i % 2 == 0 else "#ffffff"
+        rows_html += f"""
+        <tr style="background:{bg}">
+            <td style="text-align:center;color:#64748b">{i}</td>
+            <td>{d['user']}</td>
+            <td>Rp {d['budget']:,}</td>
+            <td style="text-align:center">{d['min_proc']}</td>
+            <td style="text-align:center">{d['min_ram']} GB</td>
+            <td style="text-align:center">{d['min_storage']} GB</td>
+            <td style="text-align:center">{d['min_battery']}</td>
+            <td style="color:#15803d;font-weight:600">{d['laptop']}</td>
+            <td style="text-align:center;color:#1d4ed8;font-weight:700">{d['skor']}</td>
+            <td style="text-align:center;color:#64748b;font-size:11px">{d['tanggal']}</td>
+        </tr>"""
+
+    unique_laptops = len(set(h["laptop"] for h in history))
+    avg_budget = sum(h["budget"] for h in history) // len(history)
+    best = max(history, key=lambda x: x["skor"])
+
+    html = f"""<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Riwayat SPK Laptop</title>
+<style>
+  @page {{ size: A4 landscape; margin: 15mm; }}
+  * {{ box-sizing: border-box; }}
+  body {{ font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; background: #fff; }}
+  .header {{ background: #1e3a5f; color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 16px; }}
+  .header h1 {{ margin:0; font-size:20px; letter-spacing:2px; }}
+  .header p  {{ margin:4px 0 0; font-size:11px; color:#94a3b8; }}
+  .meta {{ font-size:11px; color:#475569; margin-bottom:16px; line-height:1.8; }}
+  .stats {{ display:flex; gap:12px; margin-bottom:20px; }}
+  .stat-card {{ flex:1; border:1px solid #bfdbfe; border-radius:8px; padding:10px 14px; background:#eff6ff; text-align:center; }}
+  .stat-card .lbl {{ font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; }}
+  .stat-card .val {{ font-size:18px; font-weight:700; color:#1e40af; margin-top:4px; }}
+  table {{ width:100%; border-collapse:collapse; font-size:11px; }}
+  thead tr {{ background:#1e3a5f; color:white; }}
+  th {{ padding:8px 6px; text-align:center; font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }}
+  td {{ padding:6px 6px; border-bottom:1px solid #e2e8f0; }}
+  .footer {{ margin-top:20px; font-size:9px; color:#94a3b8; text-align:center; border-top:1px solid #e2e8f0; padding-top:10px; }}
+  @media print {{ body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }} }}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>💻 SPK LAPTOP — METODE SMART</h1>
+  <p>Sistem Pendukung Keputusan Pemilihan Laptop</p>
+</div>
+<div class="meta">
+  <b>Laporan Riwayat Analisis</b><br>
+  Dicetak oleh : <b>{username}</b> ({role.upper()})<br>
+  Tanggal cetak: {now_str}<br>
+  Total data   : <b>{len(history)}</b> analisis
+</div>
+<div class="stats">
+  <div class="stat-card"><div class="lbl">Total Pencarian</div><div class="val">{len(history)}</div></div>
+  <div class="stat-card"><div class="lbl">Laptop Unik</div><div class="val">{unique_laptops}</div></div>
+  <div class="stat-card"><div class="lbl">Rata-rata Budget</div><div class="val">Rp {avg_budget:,}</div></div>
+  <div class="stat-card"><div class="lbl">Skor Terbaik</div><div class="val">{best['skor']}</div></div>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>No</th><th>User</th><th>Budget</th>
+      <th>Min Proc</th><th>Min RAM</th><th>Min Stor</th><th>Min Bat</th>
+      <th>Rekomendasi</th><th>Skor</th><th>Waktu</th>
+    </tr>
+  </thead>
+  <tbody>{rows_html}</tbody>
+</table>
+<div class="footer">Dokumen ini digenerate otomatis oleh Sistem SPK Laptop — Metode SMART</div>
+</body>
+</html>"""
+    return html.encode("utf-8")
 
 
 # ── Sidebar ───────────────────────────────────────────────
@@ -185,7 +263,7 @@ st.markdown("""
 
 history = st.session_state.rec_history
 
-# Filter by role: mahasiswa only sees own history
+# Filter by role
 if st.session_state.role != "admin":
     history = [h for h in history if h["user"] == st.session_state.username]
 
@@ -204,51 +282,51 @@ avg_budget = sum(h["budget"] for h in history) // len(history)
 
 st.markdown(f"""
 <div class="mini-grid">
-    <div class="mini-card">
-        <div class="lbl">Total Pencarian</div>
-        <div class="val accent">{len(history)}</div>
-    </div>
-    <div class="mini-card">
-        <div class="lbl">Laptop Unik Muncul</div>
-        <div class="val">{len(unique_laptops)}</div>
-    </div>
-    <div class="mini-card">
-        <div class="lbl">Rata-rata Budget</div>
-        <div class="val">Rp {avg_budget:,}</div>
-    </div>
-    <div class="mini-card">
-        <div class="lbl">Rekomendasi Terbaru</div>
-        <div class="val" style="font-size:13px; color:#60a5fa;">{history[-1]['laptop']}</div>
-    </div>
+    <div class="mini-card"><div class="lbl">Total Pencarian</div><div class="val accent">{len(history)}</div></div>
+    <div class="mini-card"><div class="lbl">Laptop Unik Muncul</div><div class="val">{len(unique_laptops)}</div></div>
+    <div class="mini-card"><div class="lbl">Rata-rata Budget</div><div class="val">Rp {avg_budget:,}</div></div>
+    <div class="mini-card"><div class="lbl">Rekomendasi Terbaru</div><div class="val" style="font-size:13px;color:#60a5fa;">{history[-1]['laptop']}</div></div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Download PDF button ───────────────────────────────────
-st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
 
-col_dl, col_clear = st.columns([1, 1]) if st.session_state.role == "admin" else (st.columns([1, 2]))
+# ── Download buttons ──────────────────────────────────────
+now_fn = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-with col_dl:
-    try:
-        pdf_bytes = generate_pdf_riwayat(
-            history,
-            st.session_state.username,
-            st.session_state.role,
-        )
-        now_fn = datetime.now().strftime("%Y%m%d_%H%M%S")
+col_pdf, col_html, col_clear = st.columns([1, 1, 1]) if st.session_state.role == "admin" else st.columns([1, 1, 2])
+
+with col_pdf:
+    # Coba fpdf2 dulu
+    pdf_bytes = generate_pdf_bytes(history, st.session_state.username, st.session_state.role)
+    if pdf_bytes:
         st.download_button(
-            label="⬇️ Unduh Laporan PDF",
+            label="⬇️ Unduh PDF",
             data=pdf_bytes,
-            file_name=f"riwayat_spk_laptop_{now_fn}.pdf",
+            file_name=f"riwayat_spk_{now_fn}.pdf",
             mime="application/pdf",
             use_container_width=True,
             type="primary",
-            help="Unduh seluruh riwayat analisis sebagai file PDF",
+            help="Unduh laporan dalam format PDF",
         )
-    except Exception as e:
-        st.error(f"Gagal generate PDF: {e}")
+    else:
+        st.markdown("""
+        <div class="info-banner" style="font-size:12px; padding:8px 12px;">
+            Install <code>fpdf2</code> untuk unduh PDF native.
+        </div>""", unsafe_allow_html=True)
 
-# ── Clear history (admin only) ────────────────────────────
+with col_html:
+    html_bytes = generate_html_report(history, st.session_state.username, st.session_state.role)
+    st.download_button(
+        label="🖨️ Unduh / Print HTML",
+        data=html_bytes,
+        file_name=f"riwayat_spk_{now_fn}.html",
+        mime="text/html",
+        use_container_width=True,
+        type="secondary",
+        help="Unduh sebagai HTML — buka di browser lalu Ctrl+P untuk save PDF",
+    )
+
 if st.session_state.role == "admin":
     with col_clear:
         if st.button("🗑️ Hapus Semua Riwayat", type="secondary", use_container_width=True, key="clear_hist"):
@@ -257,8 +335,7 @@ if st.session_state.role == "admin":
             st.rerun()
 
 # ── History table ─────────────────────────────────────────
-st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-
+st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
 rows = ""
 for i, d in enumerate(reversed(history), 1):
     cls = "r-even" if i % 2 == 0 else "r-odd"
@@ -280,16 +357,10 @@ st.markdown(f"""
 <div class="spk-table-wrap" style="margin-top:8px;">
 <table class="spk-table">
     <thead><tr>
-        <th class="tc">No</th>
-        <th>User</th>
-        <th>Budget</th>
-        <th class="tc">Min Proc</th>
-        <th class="tc">Min RAM</th>
-        <th class="tc">Min Stor</th>
-        <th class="tc">Min Bat</th>
-        <th>Rekomendasi</th>
-        <th class="tc">Skor</th>
-        <th class="tc">Waktu</th>
+        <th class="tc">No</th><th>User</th><th>Budget</th>
+        <th class="tc">Min Proc</th><th class="tc">Min RAM</th>
+        <th class="tc">Min Stor</th><th class="tc">Min Bat</th>
+        <th>Rekomendasi</th><th class="tc">Skor</th><th class="tc">Waktu</th>
     </tr></thead>
     <tbody>{rows}</tbody>
 </table>
