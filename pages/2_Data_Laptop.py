@@ -55,12 +55,20 @@ with tab_view:
     rows = ""
     for i, lp in enumerate(st.session_state.laptops):
         cls = "r-even" if i % 2 == 0 else "r-odd"
-        p_name = lp.get('processor', '').strip()
+        
+        # PERBAIKAN SINKRONISASI: deteksi dan berikan string label jika kolom processor kosong
+        p_name = lp.get('processor', '').strip() if isinstance(lp.get('processor'), str) else ""
         if not p_name:
             p_name = state.proc_label(lp['processor_score'])
             
-        # Tampilkan harga dalam format Rupiah asli penuh
-        display_price = int(lp['harga'] * 1_000_000)
+        # Proteksi nilai hitung harga agar tidak berlipat ganda rupiahnya
+        raw_price = lp['harga']
+        if raw_price < 100:
+            display_price = int(raw_price * 1_000_000)
+        elif raw_price > 1000000:
+            display_price = int(raw_price / 1_000_000) * 1_000_000 if raw_price > 40000000 else int(raw_price)
+        else:
+            display_price = int(raw_price * 1_000_000)
 
         rows += f"""
         <tr class="{cls}">
@@ -104,7 +112,6 @@ if tab_add:
                 rm = st.selectbox("Kapasitas RAM", [4, 8, 12, 16, 32], index=1, format_func=lambda x: f"{x} GB")
                 st2 = st.selectbox("Kapasitas Storage", [128, 256, 512, 1024, 2048], index=2, format_func=lambda x: f"{x} GB")
                 bt = st.number_input("Kapasitas Baterai (mAh)", 1000, 15000, 4000, step=100)
-                # Input Rupiah Penuh untuk Admin
                 hg = st.number_input("Harga Laptop (Rupiah Penuh)", 1000000, 150000000, 10000000, step=100000)
             sub = st.form_submit_button("➕ Tambahkan ke Sistem", use_container_width=True, type="primary")
 
@@ -113,8 +120,7 @@ if tab_add:
                 state.set_flash("warn", "⚠️ Nama laptop tidak boleh kosong.")
                 st.rerun()
             else:
-                # Konversi dari angka penuh kembali ke desimal juta untuk database rumus
-                db_price = float(hg / 1_000_000)
+                db_price = float(hg / 1_000_000) if hg > 100000 else float(hg)
                 st.session_state.laptops.append({
                     "nama": nm.strip(), "processor": pr.strip(), "processor_score": ps,
                     "ram": rm, "storage": st2, "battery": bt, "harga": db_price
@@ -130,8 +136,8 @@ if tab_edit:
         idx = int(sel.split(".")[0]) - 1
         lp = st.session_state.laptops[idx]
 
-        # Ambil nilai default desimal dikali 1 juta agar form edit menampilkan angka penuh
-        current_price_full = int(lp["harga"] * 1_000_000)
+        current_val = lp["harga"]
+        current_price_full = int(current_val * 1_000_000) if current_val < 100000 else int(current_val)
 
         with st.form("form_edit_laptop"):
             c1, c2 = st.columns(2)
@@ -153,10 +159,10 @@ if tab_edit:
             upd = st.form_submit_button("📝 Simpan Perubahan", use_container_width=True, type="primary")
 
         if upd:
-            # Konversi kembali ke desimal juta sebelum di-save ke database session
+            save_price = float(hg / 1_000_000) if hg > 100000 else float(hg)
             st.session_state.laptops[idx] = {
                 "nama": nm.strip(), "processor": pr.strip(), "processor_score": ps,
-                "ram": rm, "storage": st2, "battery": bt, "harga": float(hg / 1_000_000)
+                "ram": rm, "storage": st2, "battery": bt, "harga": save_price
             }
             state.set_flash("ok", f'✅ Data "{nm.strip()}" berhasil diperbarui.')
             st.rerun()

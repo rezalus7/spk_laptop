@@ -1,6 +1,6 @@
 import streamlit as st
 
-# ── Data laptop (Kembali ke format desimal asli Excel agar skor aman) ─────────────────────
+# ── Data laptop (Format Desimal Asli Sesuai Excel Rumus Awal) ─────────────────────
 DEFAULT_LAPTOPS = [
     {"nama": 'MacBook Air 13" (M1 2020)',         "storage": 256,  "ram": 8,  "processor_score": 40,  "battery": 4300, "harga": 9.0},
     {"nama": 'MacBook Air 13" (M2 2022)',         "storage": 256,  "ram": 8,  "processor_score": 60,  "battery": 4730, "harga": 13.3},
@@ -21,12 +21,12 @@ DEFAULT_LAPTOPS = [
     {"nama": "Lenovo IdeaPad Slim 3 Intel",       "storage": 256,  "ram": 8,  "processor_score": 70,  "battery": 4950, "harga": 6.1},
     {"nama": "Lenovo ThinkPad L14 Gen 4",         "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 4156, "harga": 14.5},
     {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15.5},
-    {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 64.0},
-    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 4.6},
-    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 4.6},
-    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 4.6},
+    {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6.4},
+    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 46220.0},
+    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 46253.0},
+    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 46180.0},
     {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15.0},
-    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 4.6},
+    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 46151.0},
     {"nama": "Acer Aspire Lite 14 (AL14-37P)",    "storage": 512,  "ram": 8,  "processor_score": 40,  "battery": 3900, "harga": 6.8},
     {"nama": "Acer Aspire Go 14 (AG14-31P)",      "storage": 512,  "ram": 8,  "processor_score": 45,  "battery": 4700, "harga": 8.0},
     {"nama": "Acer Aspire Lite 15 (AL15 Ryzen 7)","storage": 512,  "ram": 16, "processor_score": 100, "battery": 5100, "harga": 11.8},
@@ -39,12 +39,11 @@ DEFAULT_USERS = [
     {"username": "mahasiswa", "password": "123", "role": "mahasiswa"},
 ]
 
-# ── Batas MIN/MAX global (Format desimal Excel) ──
 _MAX_S = 2048;  _MIN_S = 256
 _MAX_R = 32;    _MIN_R = 4
 _MAX_P = 100;   _MIN_P = 40
 _MAX_B = 6068;  _MIN_B = 3240
-_MAX_H = 46253.0; _MIN_H = 6.1
+_MAX_H = 46253; _MIN_H = 6.1
 
 W_S = 0.25227680   
 W_R = 0.20120370   
@@ -52,7 +51,8 @@ W_P = 0.26027991
 W_B = 0.14819219   
 W_H = 0.13804739   
 
-_DATA_VERSION = 10  # Naikkan ke v10 agar reset paksa data session
+# Diubah ke v20 untuk memaksa Streamlit menghapus total data cache bermasalah dari memori browser
+_DATA_VERSION = 20  
 
 def init_state():
     defaults = {"logged_in": False, "username": "", "role": "", "rec_history": [], "flash": None}
@@ -94,9 +94,7 @@ def rank_laptops(max_harga=None):
         skor = smart_score(u)
         results.append({**lp, "utilitas": u, "skor": skor})
     if max_harga is not None:
-        # Menangani konversi jika user memasukkan budget dalam format angka penuh
-        actual_max = max_harga / 1000000 if max_harga > 100000 else max_harga
-        results = [r for r in results if r["harga"] <= actual_max]
+        results = [r for r in results if r["harga"] <= max_harga]
     results.sort(key=lambda x: x["skor"], reverse=True)
     for i, r in enumerate(results, 1): r["ranking"] = i
     return results
@@ -119,7 +117,7 @@ def kegunaan(lp):
     if p >= 90 and r >= 12: cocok.append("Gaming Mid-High"); tips.append("game stabil")
     if r >= 8 and s >= 512: cocok.append("Office & Produktivitas")
     if b >= 5000: cocok.append("Mobilitas Tinggi"); tips.append("baterai seharian")
-    if h <= 10.0: tips.append("harga ramah mahasiswa")
+    if h <= 10: tips.append("harga ramah mahasiswa")
     else: tips.append("investasi premium")
     if not cocok: cocok = ["Penggunaan Umum"]
     return f"🎯 {', '.join(cocok)}. 💡 {'. '.join(t.capitalize() for t in tips)}."
