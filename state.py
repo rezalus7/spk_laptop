@@ -23,8 +23,8 @@ DEFAULT_LAPTOPS = [
     {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15500000.0},
     {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6400000.0},
     # Nilai laptop DELL dikembalikan ke angka skala besar semula (dikali 1 juta) agar rumus pembagi normalisasi Excel kamu cocok
-    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 4000622},
-    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga":4000600},
+    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 4622},
+    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga":4600},
     {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 4000600},
     {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15000000.0},
     {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 4000615},
