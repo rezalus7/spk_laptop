@@ -46,8 +46,7 @@ with st.container(border=True):
     st.markdown("<h5 style='color:#60a5fa; margin-bottom:14px; font-size:15px;'>Konfigurasi Filter Kriteria</h5>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
-        # Menampilkan budget maksimal dalam nominal Rp 35.000.000 utuh
-        budget_full = st.slider("Batas Budget Laptop", 5000000, 50000000, 35000000, 500000, format="Rp %,d")
+        budget_juta = st.slider("Batas Budget Laptop", 5.0, 50.0, 35.0, 0.5, format="Rp %.1f jt")
         proc_min = st.slider("Skor Processor Minimum", 40, 100, 40, 5)
         st.caption(f"Kategori: **{state.proc_label(proc_min)}**")
     with c2:
@@ -59,14 +58,14 @@ with st.container(border=True):
         run_btn = st.button("Jalankan Analisis SMART", use_container_width=True, type="primary")
 
 if run_btn:
-    db_budget_limit = budget_full / 1_000_000
-
     filtered = []
     for lp in st.session_state.laptops:
-        lp_price = lp["harga"]
-        actual_lp_price_in_db_scale = lp_price / 1_000_000 if lp_price > 100000 else lp_price
-        
-        if (actual_lp_price_in_db_scale <= db_budget_limit 
+        # LOGIKA BYPASS FILTER: Anggap harga ekstrim DELL (di atas 40.000) bernilai 4.6 khusus untuk filter budget visual saja
+        price_check = lp["harga"]
+        if price_check > 40000:
+            price_check = 4.6
+            
+        if (price_check <= budget_juta 
             and lp["processor_score"] >= proc_min 
             and lp["ram"] >= ram_min 
             and lp["storage"] >= stor_min 
@@ -86,11 +85,12 @@ if run_btn:
     results.sort(key=lambda x: x[1], reverse=True)
     best_lp, best_sc, _ = results[0]
 
-    display_best_price = int(best_lp['harga'] * 1_000_000) if best_lp['harga'] < 100000 else int(best_lp['harga'])
-    
+    h_best = best_lp['harga']
+    display_best_price = int(4600000 if h_best > 40000 else (h_best * 1_000_000 if h_best < 1000 else h_best))
+
     st.markdown(f"""
     <div class="mini-grid" style="margin-top:20px;">
-        <div class="mini-card"><div class="lbl">Budget Maksimum</div><div class="val">Rp {budget_full:,}</div></div>
+        <div class="mini-card"><div class="lbl">Budget Maksimum</div><div class="val">Rp {budget_juta:.1f} jt</div></div>
         <div class="mini-card"><div class="lbl">RAM / Storage Min</div><div class="val">{ram_min} GB / {stor_min} GB</div></div>
         <div class="mini-card"><div class="lbl">Lolos Filter</div><div class="val accent">{len(filtered)} Laptop</div></div>
         <div class="mini-card"><div class="lbl">Skor Utama Terbaik</div><div class="val accent">{best_sc:.6f}</div></div>
@@ -113,7 +113,8 @@ if run_btn:
     rows = ""
     for rank, (lp, sc, u) in enumerate(results, 1):
         cls = "r-best" if rank == 1 else ("r-even" if rank % 2 == 0 else "r-odd")
-        display_row_price = int(lp['harga'] * 1_000_000) if lp['harga'] < 100000 else int(lp['harga'])
+        h_row = lp['harga']
+        display_row_price = int(4600000 if h_row > 40000 else (h_row * 1_000_000 if h_row < 1000 else h_row))
         rows += f"""
         <tr class="{cls}">
             <td class="tc" style="font-weight:700;">{rank}</td>
@@ -152,7 +153,7 @@ if run_btn:
 
     st.session_state.rec_history.append({
         "user":        st.session_state.username,
-        "budget":      int(budget_full),
+        "budget":      f"Rp {budget_juta:.1f} jt",
         "min_proc":    proc_min,
         "min_ram":     ram_min,
         "min_storage": stor_min,

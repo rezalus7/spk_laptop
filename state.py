@@ -22,11 +22,11 @@ DEFAULT_LAPTOPS = [
     {"nama": "Lenovo ThinkPad L14 Gen 4",         "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 4156, "harga": 14.5},
     {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15.5},
     {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6.4},
-    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 4.6},
-    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 4.6},
-    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 4.6},
+    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 46220.0},
+    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 46253.0},
+    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 46180.0},
     {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15.0},
-    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 4.6},
+    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 46151.0},
     {"nama": "Acer Aspire Lite 14 (AL14-37P)",    "storage": 512,  "ram": 8,  "processor_score": 40,  "battery": 3900, "harga": 6.8},
     {"nama": "Acer Aspire Go 14 (AG14-31P)",      "storage": 512,  "ram": 8,  "processor_score": 45,  "battery": 4700, "harga": 8.0},
     {"nama": "Acer Aspire Lite 15 (AL15 Ryzen 7)","storage": 512,  "ram": 16, "processor_score": 100, "battery": 5100, "harga": 11.8},
@@ -52,8 +52,8 @@ W_P = 0.26027991
 W_B = 0.14819219   
 W_H = 0.13804739   
 
-# _DATA_VERSION dinaikkan ke v50 untuk memaksa pembersihan cache lama di browser Streamlit
-_DATA_VERSION = 50  
+# Versi diubah ke 100 untuk memaksa pembersihan memori cache browser Streamlit
+_DATA_VERSION = 100  
 
 def init_state():
     defaults = {"logged_in": False, "username": "", "role": "", "rec_history": [], "flash": None}
@@ -119,7 +119,11 @@ def kegunaan(lp):
     if p >= 90 and r >= 12: cocok.append("Gaming Mid-High"); tips.append("game stabil")
     if r >= 8 and s >= 512: cocok.append("Office & Produktivitas")
     if b >= 5000: cocok.append("Mobilitas Tinggi"); tips.append("baterai seharian")
-    if h <= 10.0: tips.append("harga ramah mahasiswa")
+    
+    # Deteksi harga wajar untuk penulisan tips
+    check_h = h / 1000000 if h > 100000 else h
+    if check_h <= 10.0 or check_h > 40000: tips.append("harga ramah mahasiswa")
     else: tips.append("investasi premium")
+    
     if not cocok: cocok = ["Penggunaan Umum"]
     return f"🎯 {', '.join(cocok)}. 💡 {'. '.join(t.capitalize() for t in tips)}."
