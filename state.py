@@ -1,38 +1,37 @@
 import streamlit as st
 
-# ── Data laptop (sesuai persis Excel) ─────────────────────
-# Harga dalam satuan juta rupiah (contoh: 9 = Rp 9.000.000)
+# ── Data laptop (Format Rupiah Penuh Tanpa Desimal) ─────────────────────
 DEFAULT_LAPTOPS = [
-    {"nama": 'MacBook Air 13" (M1 2020)',         "storage": 256,  "ram": 8,  "processor_score": 40,  "battery": 4300, "harga": 9.0},
-    {"nama": 'MacBook Air 13" (M2 2022)',         "storage": 256,  "ram": 8,  "processor_score": 60,  "battery": 4730, "harga": 13.3},
-    {"nama": 'MacBook Air 13" (M3 2024)',         "storage": 256,  "ram": 8,  "processor_score": 100, "battery": 4730, "harga": 14.0},
-    {"nama": 'MacBook Air 15" (M3 2024)',         "storage": 512,  "ram": 12, "processor_score": 100, "battery": 5849, "harga": 26.0},
-    {"nama": 'MacBook Pro 14" (M3 2023)',         "storage": 512,  "ram": 8,  "processor_score": 100, "battery": 6068, "harga": 22.0},
-    {"nama": "HP 14-EP1711TU",                    "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 3560, "harga": 9.9},
-    {"nama": "HP 14s-dq4016TU",                  "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 9.5},
-    {"nama": "HP Victus 15-fb3150AX",             "storage": 512,  "ram": 16, "processor_score": 100, "battery": 4550, "harga": 20.1},
-    {"nama": "HP Victus 15-fa2666TX",             "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 4550, "harga": 17.5},
-    {"nama": "HP 14s-FQ1036AU/FQ Series",         "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 18.3},
-    {"nama": "Huawei MateBook D14 (2024)",        "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 3665, "harga": 10.5},
-    {"nama": "Huawei MateBook D15",               "storage": 512,  "ram": 8,  "processor_score": 60,  "battery": 3665, "harga": 7.4},
-    {"nama": "Huawei MateBook D16 (2024)",        "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 6000, "harga": 13.0},
-    {"nama": "Huawei MateBook 14",                "storage": 1024, "ram": 16, "processor_score": 100, "battery": 6000, "harga": 14.5},
-    {"nama": "Huawei MateBook X Pro Premium",     "storage": 2048, "ram": 32, "processor_score": 60,  "battery": 6000, "harga": 34.8},
-    {"nama": "Lenovo IdeaPad Slim 3",             "storage": 512,  "ram": 8,  "processor_score": 60,  "battery": 4156, "harga": 6.5},
-    {"nama": "Lenovo IdeaPad Slim 3 Intel",       "storage": 256,  "ram": 8,  "processor_score": 70,  "battery": 4950, "harga": 6.1},
-    {"nama": "Lenovo ThinkPad L14 Gen 4",         "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 4156, "harga": 14.5},
-    {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15.5},
-    {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6.4},
-    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 46220.0},
-    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 46253.0},
-    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 46180.0},
-    {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15.0},
-    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 46151.0},
-    {"nama": "Acer Aspire Lite 14 (AL14-37P)",    "storage": 512,  "ram": 8,  "processor_score": 40,  "battery": 3900, "harga": 6.8},
-    {"nama": "Acer Aspire Go 14 (AG14-31P)",      "storage": 512,  "ram": 8,  "processor_score": 45,  "battery": 4700, "harga": 8.0},
-    {"nama": "Acer Aspire Lite 15 (AL15 Ryzen 7)","storage": 512,  "ram": 16, "processor_score": 100, "battery": 5100, "harga": 11.8},
-    {"nama": "Acer Swift Go 14 AI (SFG14-71T)",   "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 5570, "harga": 12.9},
-    {"nama": "Acer Nitro V15 (ANV15-42-R60U)",    "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 5100, "harga": 17.6},
+    {"nama": 'MacBook Air 13" (M1 2020)',         "storage": 256,  "ram": 8,  "processor_score": 40,  "battery": 4300, "harga": 9000000.0},
+    {"nama": 'MacBook Air 13" (M2 2022)',         "storage": 256,  "ram": 8,  "processor_score": 60,  "battery": 4730, "harga": 13300000.0},
+    {"nama": 'MacBook Air 13" (M3 2024)',         "storage": 256,  "ram": 8,  "processor_score": 100, "battery": 4730, "harga": 14000000.0},
+    {"nama": 'MacBook Air 15" (M3 2024)',         "storage": 512,  "ram": 12, "processor_score": 100, "battery": 5849, "harga": 26000000.0},
+    {"nama": 'MacBook Pro 14" (M3 2023)',         "storage": 512,  "ram": 8,  "processor_score": 100, "battery": 6068, "harga": 22000000.0},
+    {"nama": "HP 14-EP1711TU",                    "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 3560, "harga": 9900000.0},
+    {"nama": "HP 14s-dq4016TU",                  "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 9500000.0},
+    {"nama": "HP Victus 15-fb3150AX",             "storage": 512,  "ram": 16, "processor_score": 100, "battery": 4550, "harga": 20100000.0},
+    {"nama": "HP Victus 15-fa2666TX",             "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 4550, "harga": 17500000.0},
+    {"nama": "HP 14s-FQ1036AU/FQ Series",         "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 18300000.0},
+    {"nama": "Huawei MateBook D14 (2024)",        "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 3665, "harga": 10500000.0},
+    {"nama": "Huawei MateBook D15",               "storage": 512,  "ram": 8,  "processor_score": 60,  "battery": 3665, "harga": 7400000.0},
+    {"nama": "Huawei MateBook D16 (2024)",        "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 6000, "harga": 13000000.0},
+    {"nama": "Huawei MateBook 14",                "storage": 1024, "ram": 16, "processor_score": 100, "battery": 6000, "harga": 14500000.0},
+    {"nama": "Huawei MateBook X Pro Premium",     "storage": 2048, "ram": 32, "processor_score": 60,  "battery": 6000, "harga": 34800000.0},
+    {"nama": "Lenovo IdeaPad Slim 3",             "storage": 512,  "ram": 8,  "processor_score": 60,  "battery": 4156, "harga": 6500000.0},
+    {"nama": "Lenovo IdeaPad Slim 3 Intel",       "storage": 256,  "ram": 8,  "processor_score": 70,  "battery": 4950, "harga": 6100000.0},
+    {"nama": "Lenovo ThinkPad L14 Gen 4",         "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 4156, "harga": 14500000.0},
+    {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15500000.0},
+    {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6400000.0},
+    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 14200000.0},
+    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 12500000.0},
+    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 6800000.0},
+    {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15000000.0},
+    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 8500000.0},
+    {"nama": "Acer Aspire Lite 14 (AL14-37P)",    "storage": 512,  "ram": 8,  "processor_score": 40,  "battery": 3900, "harga": 6800000.0},
+    {"nama": "Acer Aspire Go 14 (AG14-31P)",      "storage": 512,  "ram": 8,  "processor_score": 45,  "battery": 4700, "harga": 8000000.0},
+    {"nama": "Acer Aspire Lite 15 (AL15 Ryzen 7)","storage": 512,  "ram": 16, "processor_score": 100, "battery": 5100, "harga": 11800000.0},
+    {"nama": "Acer Swift Go 14 AI (SFG14-71T)",   "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 5570, "harga": 12900000.0},
+    {"nama": "Acer Nitro V15 (ANV15-42-R60U)",    "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 5100, "harga": 17600000.0},
 ]
 
 DEFAULT_USERS = [
@@ -40,30 +39,22 @@ DEFAULT_USERS = [
     {"username": "mahasiswa", "password": "123", "role": "mahasiswa"},
 ]
 
-# ── Konstanta MIN/MAX global (dari dataset 30 laptop di atas) ──
-# PENTING: nilai ini TETAP mengacu pada seluruh dataset,
-# bukan hanya laptop yang lolos filter harga.
-# Ini memastikan normalisasi konsisten dengan Excel.
+# ── Konstanta MIN/MAX global (Diseragamkan ke Rupiah penuh) ──
 _MAX_S = 2048;  _MIN_S = 256
 _MAX_R = 32;    _MIN_R = 4
 _MAX_P = 100;   _MIN_P = 40
 _MAX_B = 6068;  _MIN_B = 3240
-_MAX_H = 46253; _MIN_H = 6.1
+_MAX_H = 34800000; _MIN_H = 6100000
 
 # ── Bobot SMART (sesuai persis Excel) ─────────────────────
-# C1=Storage, C2=RAM, C3=Processor, C4=Battery, C5=Harga
-W_S = 0.25227680   # Storage   (Prioritas 2)
-W_R = 0.20120370   # RAM       (Prioritas 3)
-W_P = 0.26027991   # Processor (Prioritas 1)
-W_B = 0.14819219   # Battery   (Prioritas 4)
-W_H = 0.13804739   # Harga     (Prioritas 5)
+W_S = 0.25227680   
+W_R = 0.20120370   
+W_P = 0.26027991   
+W_B = 0.14819219   
+W_H = 0.13804739   
 
+_DATA_VERSION = 3  # v3: Sinkronisasi format Rupiah Penuh
 
-# ── Versi data — naikkan angka ini setiap kali DEFAULT_LAPTOPS diubah ──
-_DATA_VERSION = 2  # v2: harga dalam satuan juta rupiah
-
-
-# ── Session state ──────────────────────────────────────────
 def init_state():
     defaults = {
         "logged_in": False,
@@ -78,20 +69,15 @@ def init_state():
     if "users" not in st.session_state:
         st.session_state.users = DEFAULT_USERS.copy()
 
-    # Paksa reload data laptops jika versi lama atau belum ada.
-    # Ini mencegah session state lama (harga dalam ribuan) masih dipakai.
     if (
         "laptops" not in st.session_state
         or st.session_state.get("_data_version") != _DATA_VERSION
-        or (st.session_state.laptops and st.session_state.laptops[0]["harga"] > 1000)
     ):
         st.session_state.laptops = [l.copy() for l in DEFAULT_LAPTOPS]
         st.session_state["_data_version"] = _DATA_VERSION
 
-
 def set_flash(kind, msg):
     st.session_state.flash = (kind, msg)
-
 
 def show_flash():
     if st.session_state.flash:
@@ -111,11 +97,7 @@ def show_flash():
         </div>""", unsafe_allow_html=True)
         st.session_state.flash = None
 
-
-# ── Kalkulasi SMART ────────────────────────────────────────
-
 def get_global_minmax():
-    """Kembalikan MIN/MAX global yang konsisten dengan Excel (selalu dari 30 data penuh)."""
     return {
         "MAX_S": _MAX_S, "MIN_S": _MIN_S,
         "MAX_R": _MAX_R, "MIN_R": _MIN_R,
@@ -124,19 +106,10 @@ def get_global_minmax():
         "MAX_H": _MAX_H, "MIN_H": _MIN_H,
     }
 
-
 def utility(lp):
-    """
-    Hitung nilai utilitas (normalisasi) untuk tiap kriteria.
-    - Storage, RAM, Processor, Battery : Benefit  → (nilai - MIN) / (MAX - MIN)
-    - Harga                             : Cost     → (MAX - nilai) / (MAX - MIN)
-    Normalisasi menggunakan MIN/MAX global (30 data penuh), bukan hanya data yang difilter.
-    """
     mm = get_global_minmax()
-
     def norm_benefit(v, lo, hi):
         return (v - lo) / (hi - lo) if hi != lo else 1.0
-
     def norm_cost(v, lo, hi):
         return (hi - v) / (hi - lo) if hi != lo else 1.0
 
@@ -148,9 +121,7 @@ def utility(lp):
         "harga":     norm_cost(   lp["harga"],            mm["MIN_H"], mm["MAX_H"]),
     }
 
-
 def smart_score(u):
-    """Hitung skor akhir SMART = Σ (bobot_i × utilitas_i)."""
     return round(
         W_S * u["storage"]   +
         W_R * u["ram"]       +
@@ -160,13 +131,7 @@ def smart_score(u):
         6
     )
 
-
 def rank_laptops(max_harga=None):
-    """
-    Hitung skor SMART semua laptop, filter opsional berdasarkan max_harga (juta),
-    lalu kembalikan daftar terurut dari skor tertinggi ke terendah.
-    Normalisasi SELALU menggunakan MIN/MAX dari 30 data penuh (konsisten dengan Excel).
-    """
     results = []
     for lp in st.session_state.laptops:
         u = utility(lp)
@@ -174,21 +139,17 @@ def rank_laptops(max_harga=None):
         results.append({**lp, "utilitas": u, "skor": skor})
 
     if max_harga is not None:
-        results = [r for r in results if r["harga"] <= max_harga]
+        # Menangani input max_harga baik berupa satuan juta (ex: 35.0) maupun rupiah penuh (ex: 35000000)
+        actual_max = max_harga * 1000000 if max_harga < 100000 else max_harga
+        results = [r for r in results if r["harga"] <= actual_max]
 
     results.sort(key=lambda x: x["skor"], reverse=True)
     for i, r in enumerate(results, 1):
         r["ranking"] = i
-
     return results
 
-
-# ── Fungsi kompatibilitas mundur (agar 1_Dashboard.py tidak perlu diubah) ──
-
 def get_minmax():
-    """Alias untuk get_global_minmax() — menjaga kompatibilitas dengan kode lama."""
     return get_global_minmax()
-
 
 def proc_label(s):
     if s <= 45:   return "⚪ Entry-Level"
@@ -196,7 +157,6 @@ def proc_label(s):
     elif s <= 75: return "🟡 Mid-Range"
     elif s <= 90: return "🟠 High-Mid"
     else:         return "🔴 High-End"
-
 
 def kegunaan(lp):
     p, r, s, b, h = lp["processor_score"], lp["ram"], lp["storage"], lp["battery"], lp["harga"]
@@ -208,7 +168,7 @@ def kegunaan(lp):
     if p >= 90 and r >= 12:              cocok.append("Gaming Mid-High");           tips.append("game stabil")
     if r >= 8  and s >= 512:             cocok.append("Office & Produktivitas")
     if b >= 5000:                        cocok.append("Mobilitas Tinggi");          tips.append("baterai seharian")
-    if h <= 10:   tips.append("harga ramah mahasiswa")
+    if h <= 10000000:   tips.append("harga ramah mahasiswa")
     else:         tips.append("investasi premium")
     if not cocok: cocok = ["Penggunaan Umum"]
     return f"🎯 {', '.join(cocok)}. 💡 {'. '.join(t.capitalize() for t in tips)}."

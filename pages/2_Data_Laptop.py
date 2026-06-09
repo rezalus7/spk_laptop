@@ -42,7 +42,6 @@ st.markdown('<p class="section-sub">Daftar seluruh unit laptop yang tersimpan da
 
 state.show_flash()
 
-# Pisahkan hak akses (Admin punya Tab Tambah/Edit/Hapus, Mahasiswa hanya Lihat Data)
 if st.session_state.role == "admin":
     tab_view, tab_add, tab_edit, tab_del = st.tabs([
         "🔍 Lihat Data", "➕ Tambah Laptop", "📝 Edit Data", "❌ Hapus Laptop"
@@ -61,9 +60,7 @@ with tab_view:
         if not p_name:
             p_name = state.proc_label(lp['processor_score'])
             
-        # Konversi nilai harga ke Rupiah penuh jika nilai di database berupa desimal kecil
-        raw_price = lp['harga']
-        display_price = int(raw_price * 1_000_000) if raw_price < 1000 else int(raw_price)
+        display_price = int(lp['harga'])
 
         rows += f"""
         <tr class="{cls}">
@@ -113,8 +110,7 @@ if tab_add:
                 rm = st.selectbox("Kapasitas RAM", [4, 8, 12, 16, 32], index=1, format_func=lambda x: f"{x} GB")
                 st2 = st.selectbox("Kapasitas Storage", [128, 256, 512, 1024, 2048], index=2, format_func=lambda x: f"{x} GB")
                 bt = st.number_input("Kapasitas Baterai (mAh)", 1000, 15000, 4000, step=100)
-                # MENGGUNAKAN NOMINAL RUPIAH PENH (Contoh: 35000000)
-                hg = st.number_input("Harga Laptop (Rupiah Penuh)", 500000, 150000000, 10000000, step=100000)
+                hg = st.number_input("Harga Laptop (Rupiah Penuh)", 1000000, 150000000, 10000000, step=100000)
             
             sub = st.form_submit_button("➕ Tambahkan ke Sistem", use_container_width=True, type="primary")
 
@@ -123,7 +119,6 @@ if tab_add:
                 state.set_flash("warn", "⚠️ Nama laptop tidak boleh kosong.")
                 st.rerun()
             else:
-                # Simpan nilai harga ke session state dalam bentuk nominal penuh
                 st.session_state.laptops.append({
                     "nama": nm.strip(), "processor": pr.strip(), "processor_score": ps,
                     "ram": rm, "storage": st2, "battery": bt, "harga": float(hg)
@@ -139,11 +134,6 @@ if tab_edit:
         
         idx = int(sel.split(".")[0]) - 1
         lp = st.session_state.laptops[idx]
-
-        # Penyesuaian nilai default harga pada form edit data
-        current_price = lp["harga"]
-        if current_price < 1000:
-            current_price = current_price * 1_000_000
 
         with st.form("form_edit_laptop"):
             c1, c2 = st.columns(2)
@@ -161,8 +151,7 @@ if tab_edit:
                 st2 = st.selectbox("Kapasitas Storage", stor_opts, index=s_idx, format_func=lambda x: f"{x} GB")
                 
                 bt = st.number_input("Baterai (mAh)", 1000, 15000, int(lp["battery"]))
-                # MENGGUNAKAN NOMINAL RUPIAH PENUH (Contoh: 35000000)
-                hg = st.number_input("Harga Laptop (Rupiah Penuh)", 500000, 150000000, int(current_price), step=100000)
+                hg = st.number_input("Harga Laptop (Rupiah Penuh)", 1000000, 150000000, int(lp["harga"]), step=100000)
 
             upd = st.form_submit_button("📝 Simpan Perubahan", use_container_width=True, type="primary")
 
@@ -179,7 +168,6 @@ if tab_del:
     with tab_del:
         names = [f"{i+1}. {l['nama']}" for i, l in enumerate(st.session_state.laptops)]
         sel2 = st.selectbox("Pilih laptop yang akan dihapus", names, key="sel_del")
-        
         idx2 = int(sel2.split(".")[0]) - 1
         target_name = st.session_state.laptops[idx2]["nama"]
 
