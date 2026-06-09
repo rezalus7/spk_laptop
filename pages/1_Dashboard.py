@@ -75,7 +75,7 @@ with st.container(border=True):
 
 # ── Computation ───────────────────────────────────────────
 if run_btn:
-    actual_budget = budget_juta * 1_000_000  # hanya untuk filter & tampilan stat card
+    actual_budget = budget_juta * 1_000_000
 
     filtered = [
         lp for lp in st.session_state.laptops
@@ -94,11 +94,12 @@ if run_btn:
         </div>""", unsafe_allow_html=True)
         st.stop()
 
-    # Kalkulasi SMART — harga tetap pakai nilai integer asli, tidak diubah
+    # Kalkulasi SMART pakai MAX_HARGA_REF sebagai acuan tetap
+    # agar hasil utility harga konsisten dengan perhitungan manual
     mm = state.get_minmax()
     results = []
     for lp in filtered:
-        u  = state.utility(lp, actual_budget, mm)
+        u  = state.utility(lp, state.MAX_HARGA_REF, mm)
         sc = state.smart_score(u)
         results.append((lp, sc, u))
 
@@ -169,7 +170,7 @@ if run_btn:
             <td class="tc">{lp['ram']} GB</td>
             <td class="tc">{lp['storage']} GB</td>
             <td class="tc">{lp['battery']}</td>
-            <td>{state.fmt_harga(lp['harga'])}</td>
+            <td style="white-space:nowrap; font-weight:600;">{state.fmt_harga(lp['harga'])}</td>
             <td class="tc">{u['processor']:.4f}</td>
             <td class="tc">{u['storage']:.4f}</td>
             <td class="tc">{u['ram']:.4f}</td>
@@ -192,7 +193,7 @@ if run_btn:
             </tr>
             <tr>
                 <th class="tc">RAM</th><th class="tc">Storage</th>
-                <th class="tc">Baterai</th><th>Harga</th>
+                <th class="tc">Baterai</th><th style="min-width:130px;">Harga</th>
                 <th class="tc">U-Proc</th><th class="tc">U-Stor</th>
                 <th class="tc">U-RAM</th><th class="tc">U-Bat</th><th class="tc">U-Hrg</th>
             </tr>
