@@ -32,7 +32,7 @@ with st.sidebar:
 
     st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
     if st.button("🚪 Logout", use_container_width=True, type="secondary"):
-        for k in ["logged_in","username","role"]:
+        for k in ["logged_in", "username", "role"]:
             st.session_state[k] = "" if k != "logged_in" else False
         st.switch_page("Beranda.py")
 
@@ -58,7 +58,6 @@ with st.container(border=True):
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        # Menampilkan slider budget (Visualisasi juta, namun nilai murni dikonversi langsung ke Rupiah penuh)
         budget_juta = st.slider(
             "Batas Budget Laptop", 5.0, 50.0, 35.0, 0.5,
             format="Rp %.1f jt",
@@ -70,14 +69,13 @@ with st.container(border=True):
         ram_min  = st.select_slider("RAM Minimum (GB)",     [4, 8, 12, 16, 32], value=4)
         stor_min = st.select_slider("Storage Minimum (GB)", [256, 512, 1024, 2048], value=256)
     with c3:
-        bat_min = st.slider("Baterai Minimum (mAh)", 3000, 6500, 3240, 100)
+        bat_min  = st.slider("Baterai Minimum (mAh)", 3000, 6500, 3240, 100)
         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-        run_btn = st.button("Jalankan Analisis SMART", use_container_width=True, type="primary")
+        run_btn  = st.button("Jalankan Analisis SMART", use_container_width=True, type="primary")
 
 # ── Computation ───────────────────────────────────────────
 if run_btn:
-    # PERBAIKAN: Konversi budget slider ke Rupiah nominal penuh untuk mencocokkan database
-    actual_budget = budget_juta * 1_000_000
+    actual_budget = budget_juta * 1_000_000  # hanya untuk filter & tampilan stat card
 
     filtered = [
         lp for lp in st.session_state.laptops
@@ -96,10 +94,12 @@ if run_btn:
         </div>""", unsafe_allow_html=True)
         st.stop()
 
+    # Kalkulasi SMART — harga tetap pakai nilai integer asli, tidak diubah
+    mm = state.get_minmax()
     results = []
     for lp in filtered:
-        u = state.utility(lp)       
-        sc = state.smart_score(u)   
+        u  = state.utility(lp, actual_budget, mm)
+        sc = state.smart_score(u)
         results.append((lp, sc, u))
 
     results.sort(key=lambda x: x[1], reverse=True)
@@ -128,7 +128,6 @@ if run_btn:
     """, unsafe_allow_html=True)
 
     # ── Best result banner ────────────────────────────────
-    display_best_price = int(best_lp['harga'])
     st.markdown(f"""
     <div class="best-result">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
@@ -150,7 +149,7 @@ if run_btn:
                 Baterai {best_lp['battery']} mAh
             </span>
             <span style="background:rgba(34,197,94,.1); color:#86efac; padding:3px 10px; border-radius:6px; font-size:12px;">
-                Harga Rp {display_best_price:,}
+                {state.fmt_harga(best_lp['harga'])}
             </span>
         </div>
     </div>
@@ -162,7 +161,6 @@ if run_btn:
     rows = ""
     for rank, (lp, sc, u) in enumerate(results, 1):
         cls = "r-best" if rank == 1 else ("r-even" if rank % 2 == 0 else "r-odd")
-        display_row_price = int(lp['harga'])
         rows += f"""
         <tr class="{cls}">
             <td class="tc" style="font-weight:700;">{rank}</td>
@@ -171,7 +169,7 @@ if run_btn:
             <td class="tc">{lp['ram']} GB</td>
             <td class="tc">{lp['storage']} GB</td>
             <td class="tc">{lp['battery']}</td>
-            <td>Rp {display_row_price:,}</td>
+            <td>{state.fmt_harga(lp['harga'])}</td>
             <td class="tc">{u['processor']:.4f}</td>
             <td class="tc">{u['storage']:.4f}</td>
             <td class="tc">{u['ram']:.4f}</td>
