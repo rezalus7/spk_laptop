@@ -32,7 +32,7 @@ with st.sidebar:
 
     st.markdown("<hr style='border-color:#1e2d45; margin:20px 0;'>", unsafe_allow_html=True)
     if st.button("🚪 Logout", use_container_width=True, type="secondary"):
-        for k in ["logged_in", "username", "role"]:
+        for k in ["logged_in","username","role"]:
             st.session_state[k] = "" if k != "logged_in" else False
         st.switch_page("Beranda.py")
 
@@ -53,37 +53,35 @@ with st.expander("Bobot Kriteria SMART yang Digunakan", expanded=False):
             st.metric(lbl, f"{w*100:.2f}%")
 
 # ── Filter panel ──────────────────────────────────────────
-# CATATAN: harga di data disimpan dalam satuan JUTA (misal 9.0 = Rp 9.000.000)
-# Slider budget juga dalam juta agar konsisten.
 with st.container(border=True):
     st.markdown("<h5 style='color:#60a5fa; margin-bottom:14px; font-size:15px;'>Konfigurasi Filter Kriteria</h5>", unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        # Budget dalam juta: min=6.1, max=35, default=12
+        # Menampilkan slider budget (Visualisasi juta, namun nilai murni dikonversi langsung ke Rupiah penuh)
         budget_juta = st.slider(
-            "Batas Budget (juta Rp)", 6.1, 35.0, 12.0, 0.5,
+            "Batas Budget Laptop", 5.0, 50.0, 35.0, 0.5,
             format="Rp %.1f jt",
-            help="Harga maksimum dalam juta rupiah. Contoh: 12 = Rp 12.000.000"
+            help="Pilih batas pengeluaran maksimum Anda"
         )
-        proc_min = st.slider("Skor Processor Minimum", 40, 100, 60, 5,
-                             help="Skor benchmark relatif (40=entry, 100=high-end)")
+        proc_min = st.slider("Skor Processor Minimum", 40, 100, 40, 5)
         st.caption(f"Kategori: **{state.proc_label(proc_min)}**")
     with c2:
-        ram_min  = st.select_slider("RAM Minimum (GB)",     [4, 8, 12, 16, 32], value=8)
-        stor_min = st.select_slider("Storage Minimum (GB)", [256, 512, 1024, 2048], value=512)
+        ram_min  = st.select_slider("RAM Minimum (GB)",     [4, 8, 12, 16, 32], value=4)
+        stor_min = st.select_slider("Storage Minimum (GB)", [256, 512, 1024, 2048], value=256)
     with c3:
-        bat_min = st.slider("Baterai Minimum (mAh)", 3240, 6068, 3500, 100)
+        bat_min = st.slider("Baterai Minimum (mAh)", 3000, 6500, 3240, 100)
         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
         run_btn = st.button("Jalankan Analisis SMART", use_container_width=True, type="primary")
 
 # ── Computation ───────────────────────────────────────────
 if run_btn:
-    # Filter laptop sesuai kriteria user.
-    # Harga di data dalam juta, budget_juta juga dalam juta → perbandingan langsung.
+    # PERBAIKAN: Konversi budget slider ke Rupiah nominal penuh untuk mencocokkan database
+    actual_budget = budget_juta * 1_000_000
+
     filtered = [
         lp for lp in st.session_state.laptops
-        if lp["harga"]           <= budget_juta
+        if float(lp["harga"])     <= actual_budget
         and lp["processor_score"] >= proc_min
         and lp["ram"]             >= ram_min
         and lp["storage"]         >= stor_min
@@ -94,17 +92,14 @@ if run_btn:
         st.markdown("""
         <div style="background:#2d1a00; color:#fcd34d; border:1px solid #7c4a00;
                     padding:14px 18px; border-radius:10px; font-size:14px; margin-top:12px;">
-            Tidak ada laptop yang memenuhi semua kriteria. Coba longgarkan filter.
+            ⚠️ Tidak ada laptop yang memenuhi semua kriteria. Coba longgarkan atau turunkan batas minimum kriteria filter Anda.
         </div>""", unsafe_allow_html=True)
         st.stop()
 
-    # Hitung utilitas & skor SMART.
-    # PENTING: normalisasi SELALU pakai MIN/MAX global 30 data (konsisten dengan Excel),
-    # bukan hanya dari laptop yang lolos filter.
     results = []
     for lp in filtered:
-        u = state.utility(lp)       # utilitas per kriteria
-        sc = state.smart_score(u)   # skor akhir SMART
+        u = state.utility(lp)       
+        sc = state.smart_score(u)   
         results.append((lp, sc, u))
 
     results.sort(key=lambda x: x[1], reverse=True)
@@ -114,11 +109,11 @@ if run_btn:
     st.markdown(f"""
     <div class="mini-grid" style="margin-top:20px;">
         <div class="mini-card">
-            <div class="lbl">Budget</div>
+            <div class="lbl">Budget Maksimum</div>
             <div class="val">Rp {budget_juta:.1f} jt</div>
         </div>
         <div class="mini-card">
-            <div class="lbl">RAM / Storage</div>
+            <div class="lbl">RAM / Storage Min</div>
             <div class="val">{ram_min} GB / {stor_min} GB</div>
         </div>
         <div class="mini-card">
@@ -126,13 +121,14 @@ if run_btn:
             <div class="val accent">{len(filtered)} Laptop</div>
         </div>
         <div class="mini-card">
-            <div class="lbl">Skor Terbaik</div>
+            <div class="lbl">Skor Utama Terbaik</div>
             <div class="val accent">{best_sc:.6f}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     # ── Best result banner ────────────────────────────────
+    display_best_price = int(best_lp['harga'])
     st.markdown(f"""
     <div class="best-result">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
@@ -154,7 +150,7 @@ if run_btn:
                 Baterai {best_lp['battery']} mAh
             </span>
             <span style="background:rgba(34,197,94,.1); color:#86efac; padding:3px 10px; border-radius:6px; font-size:12px;">
-                Harga Rp {best_lp['harga']:.1f} jt
+                Harga Rp {display_best_price:,}
             </span>
         </div>
     </div>
@@ -166,6 +162,7 @@ if run_btn:
     rows = ""
     for rank, (lp, sc, u) in enumerate(results, 1):
         cls = "r-best" if rank == 1 else ("r-even" if rank % 2 == 0 else "r-odd")
+        display_row_price = int(lp['harga'])
         rows += f"""
         <tr class="{cls}">
             <td class="tc" style="font-weight:700;">{rank}</td>
@@ -174,7 +171,7 @@ if run_btn:
             <td class="tc">{lp['ram']} GB</td>
             <td class="tc">{lp['storage']} GB</td>
             <td class="tc">{lp['battery']}</td>
-            <td>Rp {lp['harga']:.1f} jt</td>
+            <td>Rp {display_row_price:,}</td>
             <td class="tc">{u['processor']:.4f}</td>
             <td class="tc">{u['storage']:.4f}</td>
             <td class="tc">{u['ram']:.4f}</td>
@@ -210,7 +207,7 @@ if run_btn:
     # ── Save to history ───────────────────────────────────
     st.session_state.rec_history.append({
         "user":        st.session_state.username,
-        "budget":      f"Rp {budget_juta:.1f} jt",
+        "budget":      int(actual_budget),
         "min_proc":    proc_min,
         "min_ram":     ram_min,
         "min_storage": stor_min,
@@ -223,5 +220,5 @@ if run_btn:
 
     st.markdown("""
     <div class="info-banner" style="margin-top:16px;">
-        Hasil analisis telah disimpan ke riwayat.
+        Hasil analisis telah disimpan ke riwayat pencarian Anda.
     </div>""", unsafe_allow_html=True)
