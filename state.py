@@ -171,6 +171,13 @@ def rank_laptops(max_harga=None):
     return results
 
 
+# ── Fungsi kompatibilitas mundur (agar 1_Dashboard.py tidak perlu diubah) ──
+
+def get_minmax():
+    """Alias untuk get_global_minmax() — menjaga kompatibilitas dengan kode lama."""
+    return get_global_minmax()
+
+
 def proc_label(s):
     if s <= 45:   return "⚪ Entry-Level"
     elif s <= 60: return "🔵 Low-Mid"
