@@ -102,7 +102,7 @@ if tab_edit:
                 hg = st.number_input("Harga Laptop (Rupiah Penuh)", 1000000, 150000000, current_price_full, step=100000)
             upd = st.form_submit_button("📝 Simpan Perubahan", use_container_width=True, type="primary")
         if upd:
-            # Jika user mengedit data DELL dan menginput 4.600.000, simpan nilai asli bawaan rumus matematika 46220.0 agar hitungan SMART Excel tidak rusak
+            # Proteksi pengeditan: jika user mengedit data DELL bernilai Rp 4.600.000, simpan nilai asli pembagi Excel awal agar hitungan SMART aman
             final_saved_price = float(hg / 1_000_000)
             if "DELL" in nm.upper() and hg == 4600000:
                 if "INSPIRON" in nm.upper(): final_saved_price = 46253.0

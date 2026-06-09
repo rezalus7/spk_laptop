@@ -52,8 +52,8 @@ W_P = 0.26027991
 W_B = 0.14819219   
 W_H = 0.13804739   
 
-# Versi diubah ke 100 untuk memaksa pembersihan memori cache browser Streamlit
-_DATA_VERSION = 100  
+# _DATA_VERSION diubah ke v120 untuk memaksa Streamlit menghapus total sisa cache browser lama
+_DATA_VERSION = 120  
 
 def init_state():
     defaults = {"logged_in": False, "username": "", "role": "", "rec_history": [], "flash": None}
@@ -120,7 +120,6 @@ def kegunaan(lp):
     if r >= 8 and s >= 512: cocok.append("Office & Produktivitas")
     if b >= 5000: cocok.append("Mobilitas Tinggi"); tips.append("baterai seharian")
     
-    # Deteksi harga wajar untuk penulisan tips
     check_h = h / 1000000 if h > 100000 else h
     if check_h <= 10.0 or check_h > 40000: tips.append("harga ramah mahasiswa")
     else: tips.append("investasi premium")

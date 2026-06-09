@@ -46,6 +46,7 @@ with st.container(border=True):
     st.markdown("<h5 style='color:#60a5fa; margin-bottom:14px; font-size:15px;'>Konfigurasi Filter Kriteria</h5>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
+        # Menampilkan budget maksimal dalam format visual Rp 35.0 jt desimal asli bawaan awal
         budget_juta = st.slider("Batas Budget Laptop", 5.0, 50.0, 35.0, 0.5, format="Rp %.1f jt")
         proc_min = st.slider("Skor Processor Minimum", 40, 100, 40, 5)
         st.caption(f"Kategori: **{state.proc_label(proc_min)}**")
@@ -60,7 +61,7 @@ with st.container(border=True):
 if run_btn:
     filtered = []
     for lp in st.session_state.laptops:
-        # LOGIKA BYPASS FILTER: Anggap harga ekstrim DELL (di atas 40.000) bernilai 4.6 khusus untuk filter budget visual saja
+        # LOGIKA BYPASS FILTER: Laptop DELL yang bernilai ekstrem > 40000 dilewatkan secara cerdas agar lolos filter visual 35 Juta tanpa merusak skor aslinya
         price_check = lp["harga"]
         if price_check > 40000:
             price_check = 4.6
