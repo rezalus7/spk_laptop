@@ -57,7 +57,7 @@ with tab_view:
     for i, lp in enumerate(st.session_state.laptops):
         cls = "r-even" if i % 2 == 0 else "r-odd"
         
-        # PERBAIKAN: Menggunakan .get() jika nama teks processor kosong, 
+        # PERBAIKAN BERSAMA: Menggunakan .get() jika nama teks processor kosong,
         # fallback menggunakan label kategori dari fungsi state.proc_label()
         p_name = lp.get('processor', '').strip()
         if not p_name:
@@ -105,7 +105,7 @@ if tab_add:
             c1, c2 = st.columns(2)
             with c1:
                 nm = st.text_input("Nama / Seri Laptop", placeholder="Contoh: ASUS Vivobook 14")
-                pr = st.text_input("Model Processor", placeholder="Contoh: Intel Core i5-1240P / Ryzen 5 5600H")
+                pr = st.text_input("Model Processor", placeholder="Contoh: Intel Core i5-1240P")
                 ps = st.number_input("Skor Benchmark Processor (40 - 100)", 40, 100, 70)
             with c2:
                 rm = st.selectbox("Kapasitas RAM", [4, 8, 12, 16, 32], index=1, format_func=lambda x: f"{x} GB")
@@ -132,6 +132,8 @@ if tab_edit:
     with tab_edit:
         names = [f"{i+1}. {l['nama']}" for i, l in enumerate(st.session_state.laptops)]
         sel = st.selectbox("Pilih laptop yang ingin diedit", names, key="sel_edit")
+        
+        # PERBAIKAN LOGIKA INDEX: Mengambil angka murni sebelum tanda titik (.)
         idx = int(sel.split(".")[0]) - 1
         lp = st.session_state.laptops[idx]
 
@@ -142,7 +144,6 @@ if tab_edit:
                 pr = st.text_input("Model Processor", value=lp.get("processor", ""))
                 ps = st.number_input("Skor Benchmark Processor (40 - 100)", 40, 100, int(lp["processor_score"]))
             with c2:
-                # Cari indeks yang cocok untuk selectbox agar default value sesuai data awal
                 ram_opts = [4, 8, 12, 16, 32]
                 r_idx = ram_opts.index(lp["ram"]) if lp["ram"] in ram_opts else 1
                 rm = st.selectbox("Kapasitas RAM", ram_opts, index=r_idx, format_func=lambda x: f"{x} GB")
@@ -169,8 +170,11 @@ if tab_del:
     with tab_del:
         names = [f"{i+1}. {l['nama']}" for i, l in enumerate(st.session_state.laptops)]
         sel2 = st.selectbox("Pilih laptop yang akan dihapus", names, key="sel_del")
+        
         idx2 = int(sel2.split(".")[0]) - 1
-        target_name = st.session_state.laptops[idx2][["nama"]]
+        
+        # PERBAIKAN CRITICAL: Mengganti double bracket [["nama"]] menjadi single bracket ['nama']
+        target_name = st.session_state.laptops[idx2]["nama"]
 
         st.markdown(f"""
         <div style="background:#2a0a0a; border:1px solid #7f1d1d; color:#f87171; 
