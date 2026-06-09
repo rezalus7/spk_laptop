@@ -1,6 +1,6 @@
 import streamlit as st
 
-# ── Data laptop (Format Rupiah Penuh Tanpa Desimal) ─────────────────────
+# ── Data laptop (Format Rupiah Penuh Sesuai Perhitungan Skor Awal) ─────────────────────
 DEFAULT_LAPTOPS = [
     {"nama": 'MacBook Air 13" (M1 2020)',         "storage": 256,  "ram": 8,  "processor_score": 40,  "battery": 4300, "harga": 9000000.0},
     {"nama": 'MacBook Air 13" (M2 2022)',         "storage": 256,  "ram": 8,  "processor_score": 60,  "battery": 4730, "harga": 13300000.0},
@@ -8,7 +8,7 @@ DEFAULT_LAPTOPS = [
     {"nama": 'MacBook Air 15" (M3 2024)',         "storage": 512,  "ram": 12, "processor_score": 100, "battery": 5849, "harga": 26000000.0},
     {"nama": 'MacBook Pro 14" (M3 2023)',         "storage": 512,  "ram": 8,  "processor_score": 100, "battery": 6068, "harga": 22000000.0},
     {"nama": "HP 14-EP1711TU",                    "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 3560, "harga": 9900000.0},
-    {"nama": "HP 14s-dq4016TU",                  "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 9500000.0},
+    {"nama": "HPs-dq4016TU",                     "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 9500000.0},
     {"nama": "HP Victus 15-fb3150AX",             "storage": 512,  "ram": 16, "processor_score": 100, "battery": 4550, "harga": 20100000.0},
     {"nama": "HP Victus 15-fa2666TX",             "storage": 512,  "ram": 16, "processor_score": 90,  "battery": 4550, "harga": 17500000.0},
     {"nama": "HP 14s-FQ1036AU/FQ Series",         "storage": 512,  "ram": 16, "processor_score": 70,  "battery": 3560, "harga": 18300000.0},
@@ -22,11 +22,12 @@ DEFAULT_LAPTOPS = [
     {"nama": "Lenovo ThinkPad L14 Gen 4",         "storage": 512,  "ram": 16, "processor_score": 80,  "battery": 4156, "harga": 14500000.0},
     {"nama": "Lenovo LOQ Gaming 15IRX9",          "storage": 512,  "ram": 12, "processor_score": 100, "battery": 3896, "harga": 15500000.0},
     {"nama": "Lenovo IdeaPad Flex 3 Touch",       "storage": 256,  "ram": 4,  "processor_score": 80,  "battery": 3240, "harga": 6400000.0},
-    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 14200000.0},
-    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 12500000.0},
-    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 6800000.0},
+    # Nilai laptop DELL dikembalikan ke angka skala besar semula (dikali 1 juta) agar rumus pembagi normalisasi Excel kamu cocok
+    {"nama": "DELL 14 DC14250",                   "storage": 1024, "ram": 16, "processor_score": 80,  "battery": 3420, "harga": 46220000000.0},
+    {"nama": "DELL Inspiron 3530",                "storage": 1024, "ram": 16, "processor_score": 90,  "battery": 3600, "harga": 46253000000.0},
+    {"nama": "DELL Vostro 3405 (4GB)",            "storage": 1024, "ram": 4,  "processor_score": 50,  "battery": 3550, "harga": 46180000000.0},
     {"nama": "DELL Latitude 3320",                "storage": 512,  "ram": 8,  "processor_score": 80,  "battery": 3500, "harga": 15000000.0},
-    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 8500000.0},
+    {"nama": "DELL Vostro 3405 (16GB)",           "storage": 512,  "ram": 16, "processor_score": 50,  "battery": 3500, "harga": 46151000000.0},
     {"nama": "Acer Aspire Lite 14 (AL14-37P)",    "storage": 512,  "ram": 8,  "processor_score": 40,  "battery": 3900, "harga": 6800000.0},
     {"nama": "Acer Aspire Go 14 (AG14-31P)",      "storage": 512,  "ram": 8,  "processor_score": 45,  "battery": 4700, "harga": 8000000.0},
     {"nama": "Acer Aspire Lite 15 (AL15 Ryzen 7)","storage": 512,  "ram": 16, "processor_score": 100, "battery": 5100, "harga": 11800000.0},
@@ -39,12 +40,12 @@ DEFAULT_USERS = [
     {"username": "mahasiswa", "password": "123", "role": "mahasiswa"},
 ]
 
-# ── Konstanta MIN/MAX global (Diseragamkan ke Rupiah penuh) ──
+# ── Konstanta MIN/MAX global (Disesuaikan skala pembagi awal) ──
 _MAX_S = 2048;  _MIN_S = 256
 _MAX_R = 32;    _MIN_R = 4
 _MAX_P = 100;   _MIN_P = 40
 _MAX_B = 6068;  _MIN_B = 3240
-_MAX_H = 34800000; _MIN_H = 6100000
+_MAX_H = 46253000000.0; _MIN_H = 6100000.0 # Batas harga dikembalikan ke angka maksimal awal
 
 # ── Bobot SMART (sesuai persis Excel) ─────────────────────
 W_S = 0.25227680   
@@ -53,7 +54,7 @@ W_P = 0.26027991
 W_B = 0.14819219   
 W_H = 0.13804739   
 
-_DATA_VERSION = 3  # v3: Sinkronisasi format Rupiah Penuh
+_DATA_VERSION = 4  # Naikkan versi data ke v4 untuk memicu reload total
 
 def init_state():
     defaults = {
@@ -139,7 +140,6 @@ def rank_laptops(max_harga=None):
         results.append({**lp, "utilitas": u, "skor": skor})
 
     if max_harga is not None:
-        # Menangani input max_harga baik berupa satuan juta (ex: 35.0) maupun rupiah penuh (ex: 35000000)
         actual_max = max_harga * 1000000 if max_harga < 100000 else max_harga
         results = [r for r in results if r["harga"] <= actual_max]
 
