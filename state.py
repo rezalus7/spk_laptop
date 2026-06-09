@@ -59,6 +59,10 @@ W_B = 0.14819219   # Battery   (Prioritas 4)
 W_H = 0.13804739   # Harga     (Prioritas 5)
 
 
+# ── Versi data — naikkan angka ini setiap kali DEFAULT_LAPTOPS diubah ──
+_DATA_VERSION = 2  # v2: harga dalam satuan juta rupiah
+
+
 # ── Session state ──────────────────────────────────────────
 def init_state():
     defaults = {
@@ -73,8 +77,16 @@ def init_state():
             st.session_state[k] = v
     if "users" not in st.session_state:
         st.session_state.users = DEFAULT_USERS.copy()
-    if "laptops" not in st.session_state:
+
+    # Paksa reload data laptops jika versi lama atau belum ada.
+    # Ini mencegah session state lama (harga dalam ribuan) masih dipakai.
+    if (
+        "laptops" not in st.session_state
+        or st.session_state.get("_data_version") != _DATA_VERSION
+        or (st.session_state.laptops and st.session_state.laptops[0]["harga"] > 1000)
+    ):
         st.session_state.laptops = [l.copy() for l in DEFAULT_LAPTOPS]
+        st.session_state["_data_version"] = _DATA_VERSION
 
 
 def set_flash(kind, msg):
