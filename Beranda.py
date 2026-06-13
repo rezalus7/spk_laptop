@@ -194,7 +194,7 @@ with center:
         ">
             <div style="color: #60a5fa; font-size: 13px; line-height: 1.6; font-weight: 500;">
                 <b>Admin:</b> admin / admin123 <br>
-                <b>Petugas:</b> petugas / petugas123
+                <b>Mahasiswa:</b> mahasiswa / mahasiswa123
             </div>
         </div>
         """, unsafe_allow_html=True)
