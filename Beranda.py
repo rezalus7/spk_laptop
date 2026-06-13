@@ -193,8 +193,8 @@ with center:
             font-family: sans-serif;
         ">
             <div style="color: #60a5fa; font-size: 13px; line-height: 1.6; font-weight: 500;">
-                <b>Admin:</b> admin / admin123 <br>
-                <b>Mahasiswa:</b> mahasiswa / mahasiswa123
+                <b>Admin:</b> admin / 123 <br>
+                <b>Mahasiswa:</b> mahasiswa / 123
             </div>
         </div>
         """, unsafe_allow_html=True)
