@@ -181,6 +181,25 @@ with center:
                 state.set_flash("err", "❌ Username atau password salah.")
                 st.rerun()
 
+        # ─── KOTAK KETERANGAN AKUN DEFAULT (TEMA INTEGRASI BIRU) ───
+        st.markdown("""
+        <div style="
+            background-color: rgba(59, 130, 246, 0.08); 
+            border-radius: 12px; 
+            padding: 14px 18px; 
+            margin-top: 12px;
+            margin-bottom: 4px;
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            font-family: sans-serif;
+        ">
+            <div style="color: #60a5fa; font-size: 13px; line-height: 1.6; font-weight: 500;">
+                <b>Admin:</b> admin / admin123 <br>
+                <b>Petugas:</b> petugas / petugas123
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        # ────────────────────────────────────────────────────────────
+
         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
         st.markdown('<div class="register-btn">', unsafe_allow_html=True)
         if st.button("Register  →", use_container_width=True, key="go_register"):
